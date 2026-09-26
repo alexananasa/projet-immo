@@ -159,10 +159,10 @@
     setText("colocRatio", formatPercent(c.colocRatio));
     // The workbook's colocation yield formula divides by an empty range and returns 0.
     setText("colocYield", formatPercent(0));
-    document.getElementById("colocIncomeRows").innerHTML = rowsMarkup([
-      ["Loyer par chambre", v.roomRent],
-      ["Nombre de chambres", v.roomCount]
-    ], "Recettes mensuelles", c.colocIncome);
+    document.getElementById("colocIncomeRows").innerHTML =
+      '<div class="cost-row"><span>Loyer par chambre</span><strong>' + formatMoney(v.roomRent) + '</strong></div>' +
+      '<div class="cost-row"><span>Nombre de chambres</span><strong>' + plainNumber.format(v.roomCount) + '</strong></div>' +
+      '<div class="cost-row cost-row--total"><span>Recettes mensuelles</span><strong>' + formatMoney(c.colocIncome) + '</strong></div>';
     document.getElementById("colocExpenseRows").innerHTML = rowsMarkup([
       ["Crédit immobilier", c.payment],
       ["Taxe foncière (annuelle ÷ 12)", c.propertyTaxMonthly],
