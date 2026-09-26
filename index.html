@@ -1,0 +1,213 @@
+D’accord, tu fais tout sur GitHub. Désolé pour le fichier local préparé : tu peux l’ignorer.
+
+Sur ta page GitHub, donne le nom **`index.html`**, puis colle tout ce code et clique sur **Commit changes** :
+
+```html
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyse immobilière</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f3f7f4;
+      color: #172923;
+      font: 16px/1.5 system-ui, sans-serif;
+    }
+
+    main {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    header, section {
+      padding: 20px;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      background: white;
+    }
+
+    header {
+      background: #12352b;
+      color: white;
+    }
+
+    h1 { margin-top: 0; }
+
+    .champs, .resultats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label { font-weight: 600; }
+
+    input {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid #c9d5cd;
+      border-radius: 9px;
+      font: inherit;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: #176b4a;
+      color: white;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .indicateur {
+      padding: 12px;
+      border-radius: 10px;
+      background: #f3f7f4;
+    }
+
+    .indicateur span {
+      display: block;
+      color: #66756f;
+    }
+
+    .indicateur strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.2rem;
+    }
+
+    #decision {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .go { background: #e2f5e9; color: #145b38; }
+    .nogo { background: #fff0e9; color: #8b3217; }
+
+    .note { color: #66756f; font-size: 0.9rem; }
+
+    @media (max-width: 520px) {
+      .champs, .resultats { grid-template-columns: 1fr; }
+      body { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Analyse d’un bien immobilier</h1>
+      <p>Entre les informations du bien pour obtenir une première estimation.</p>
+    </header>
+
+    <section>
+      <h2>Informations du bien</h2>
+
+      <div class="champs">
+        <label>Prix d’achat (€)
+          <input id="prix" type="number" min="0" value="180000">
+        </label>
+
+        <label>Travaux (€)
+          <input id="travaux" type="number" min="0" value="15000">
+        </label>
+
+        <label>Loyer mensuel (€)
+          <input id="loyer" type="number" min="0" value="1100">
+        </label>
+
+        <label>Charges annuelles (€)
+          <input id="charges" type="number" min="0" value="1800">
+        </label>
+
+        <label>Mensualité du crédit (€)
+          <input id="credit" type="number" min="0" value="850">
+        </label>
+      </div>
+
+      <button type="button" onclick="calculer()">Calculer</button>
+    </section>
+
+    <section aria-live="polite">
+      <h2>Résultat</h2>
+
+      <div class="resultats">
+        <div class="indicateur">
+          <span>Coût total estimé</span>
+          <strong id="coutTotal">—</strong>
+        </div>
+
+        <div class="indicateur">
+          <span>Rendement brut</span>
+          <strong id="rendement">—</strong>
+        </div>
+
+        <div class="indicateur">
+          <span>Cash-flow mensuel estimé</span>
+          <strong id="cashflow">—</strong>
+        </div>
+      </div>
+
+      <div id="decision">Appuie sur « Calculer ».</div>
+
+      <p class="note">
+        Règle de démonstration : GO si le rendement brut est d’au moins 5 %
+        et si le cash-flow estimé est positif. Cette règle devra être remplacée
+        par les critères de ton fichier Excel.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    function calculer() {
+      const prix = Number(document.getElementById("prix").value) || 0;
+      const travaux = Number(document.getElementById("travaux").value) || 0;
+      const loyer = Number(document.getElementById("loyer").value) || 0;
+      const charges = Number(document.getElementById("charges").value) || 0;
+      const credit = Number(document.getElementById("credit").value) || 0;
+
+      const coutTotal = prix + travaux;
+      const rendement = coutTotal > 0 ? (loyer * 12 / coutTotal) * 100 : 0;
+      const cashflow = loyer - charges / 12 - credit;
+
+      const euros = valeur =>
+        new Intl.NumberFormat("fr-FR", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0
+        }).format(valeur);
+
+      document.getElementById("coutTotal").textContent = euros(coutTotal);
+      document.getElementById("rendement").textContent =
+        rendement.toFixed(2).replace(".", ",") + " %";
+      document.getElementById("cashflow").textContent =
+        euros(cashflow) + " / mois";
+
+      const decision = document.getElementById("decision");
+      const go = rendement >= 5 && cashflow > 0;
+
+      decision.className = go ? "go" : "nogo";
+      decision.textContent = go
+        ? "GO selon la règle de démonstration"
+        : "NO GO selon la règle de démonstration";
+    }
+
+    calculer();
+  </script>
+</body>
+</html>
+```
+
+Ce premier code sert à vérifier que la page s’affiche et que le bouton calcule. Les critères GO/NO GO sont provisoires et ne viennent pas encore de ton Excel.
