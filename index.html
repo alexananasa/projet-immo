@@ -3,203 +3,199 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12392e">
+  <meta name="description" content="Analyse immobilière modifiable avec comparaison location standard et colocation.">
   <title>Analyse immobilière</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #f3f7f4;
-      color: #172923;
-      font: 16px/1.5 system-ui, sans-serif;
-    }
-
-    main {
-      max-width: 700px;
-      margin: auto;
-    }
-
-    header, section {
-      padding: 20px;
-      margin-bottom: 16px;
-      border-radius: 16px;
-      background: white;
-    }
-
-    header {
-      background: #12352b;
-      color: white;
-    }
-
-    h1 { margin-top: 0; }
-
-    .champs, .resultats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    label { font-weight: 600; }
-
-    input {
-      display: block;
-      width: 100%;
-      margin-top: 6px;
-      padding: 12px;
-      border: 1px solid #c9d5cd;
-      border-radius: 9px;
-      font: inherit;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 18px;
-      padding: 14px;
-      border: 0;
-      border-radius: 9px;
-      background: #176b4a;
-      color: white;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .indicateur {
-      padding: 12px;
-      border-radius: 10px;
-      background: #f3f7f4;
-    }
-
-    .indicateur span {
-      display: block;
-      color: #66756f;
-    }
-
-    .indicateur strong {
-      display: block;
-      margin-top: 4px;
-      font-size: 1.2rem;
-    }
-
-    #decision {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 10px;
-      font-weight: 700;
-    }
-
-    .go { background: #e2f5e9; color: #145b38; }
-    .nogo { background: #fff0e9; color: #8b3217; }
-
-    .note { color: #66756f; font-size: 0.9rem; }
-
-    @media (max-width: 520px) {
-      .champs, .resultats { grid-template-columns: 1fr; }
-      body { padding: 12px; }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/app.js" defer></script>
 </head>
 <body>
-  <main>
-    <header>
-      <h1>Analyse d’un bien immobilier</h1>
-      <p>Entre les informations du bien pour obtenir une première estimation.</p>
+  <main class="page-shell">
+    <header class="hero">
+      <div class="hero__top">
+        <div>
+          <p class="eyebrow">Étude immobilière</p>
+          <h1>Analyse d’investissement</h1>
+          <p class="hero__text">Modifie les paramètres du bien et compare en direct la location standard et la colocation.</p>
+        </div>
+        <span class="local-state" id="saveState" role="status">Valeurs de départ du classeur</span>
+      </div>
     </header>
 
-    <section>
-      <h2>Informations du bien</h2>
+    <nav class="section-nav" aria-label="Sections de l’analyse">
+      <a href="#synthese">Synthèse</a>
+      <a href="#operation">Opération & crédit</a>
+      <a href="#standard">Location standard</a>
+      <a href="#colocation">Colocation</a>
+      <button class="reset-button" type="button" id="resetButton">Réinitialiser</button>
+    </nav>
 
-      <div class="champs">
-        <label>Prix d’achat (€)
-          <input id="prix" type="number" min="0" value="180000">
-        </label>
-
-        <label>Travaux (€)
-          <input id="travaux" type="number" min="0" value="15000">
-        </label>
-
-        <label>Loyer mensuel (€)
-          <input id="loyer" type="number" min="0" value="1100">
-        </label>
-
-        <label>Charges annuelles (€)
-          <input id="charges" type="number" min="0" value="1800">
-        </label>
-
-        <label>Mensualité du crédit (€)
-          <input id="credit" type="number" min="0" value="850">
-        </label>
+    <section class="block" id="synthese" aria-labelledby="synthese-title">
+      <div class="block-heading">
+        <div>
+          <h2 id="synthese-title">Synthèse</h2>
+          <p>Les résultats se mettent à jour lorsque tu modifies un champ.</p>
+        </div>
       </div>
-
-      <button type="button" onclick="calculer()">Calculer</button>
+      <div class="summary-grid" aria-live="polite">
+        <article class="summary-card">
+          <span class="summary-card__label">Coût de l’opération</span>
+          <strong class="summary-card__value" id="summaryOperationCost">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-card__label">Montant emprunté</span>
+          <strong class="summary-card__value" id="summaryLoanAmount">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-card__label">Mensualité du crédit</span>
+          <strong class="summary-card__value" id="summaryPayment">—</strong>
+        </article>
+        <article class="summary-card">
+          <span class="summary-card__label">Cash-flow · location standard</span>
+          <strong class="summary-card__value" id="summaryStandardCashflow">—</strong>
+        </article>
+      </div>
     </section>
 
-    <section aria-live="polite">
-      <h2>Résultat</h2>
-
-      <div class="resultats">
-        <div class="indicateur">
-          <span>Coût total estimé</span>
-          <strong id="coutTotal">—</strong>
-        </div>
-
-        <div class="indicateur">
-          <span>Rendement brut</span>
-          <strong id="rendement">—</strong>
-        </div>
-
-        <div class="indicateur">
-          <span>Cash-flow mensuel estimé</span>
-          <strong id="cashflow">—</strong>
+    <section class="block" id="operation" aria-labelledby="operation-title">
+      <div class="block-heading">
+        <div>
+          <h2 id="operation-title">Opération et crédit</h2>
+          <p>Les frais calculés et le financement reprennent les formules du classeur.</p>
         </div>
       </div>
 
-      <div id="decision">Appuie sur « Calculer ».</div>
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="section-kicker">Coût d’acquisition</span>
+            <h3>Paramètres du bien</h3>
+            <p>Les champs modifiables correspondent aux cellules jaunes de l’Excel.</p>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label for="purchasePrice">Prix de l’appartement (€)</label><input id="purchasePrice" data-field="purchasePrice" type="number" min="0" step="1000" inputmode="decimal" value="80000"></div>
+          <div class="field"><label for="agencyFees">Frais d’agence (€)</label><input id="agencyFees" data-field="agencyFees" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
+          <div class="field"><label for="works">Travaux (€)</label><input id="works" data-field="works" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
+          <div class="field"><label for="dossierFees">Frais de dossier (€)</label><input id="dossierFees" data-field="dossierFees" type="number" min="0" step="50" inputmode="decimal" value="500"></div>
+          <div class="field"><label for="brokerageFees">Frais de courtage (€)</label><input id="brokerageFees" data-field="brokerageFees" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
+          <div class="field"><label for="contribution">Apport personnel (€)</label><input id="contribution" data-field="contribution" type="number" min="0" step="1000" inputmode="decimal" value="0"></div>
+        </div>
 
-      <p class="note">
-        Règle de démonstration : GO si le rendement brut est d’au moins 5 %
-        et si le cash-flow estimé est positif. Cette règle devra être remplacée
-        par les critères de ton fichier Excel.
-      </p>
+        <h4 class="subsection-title">Financement et marché</h4>
+        <div class="field-grid">
+          <div class="field"><label for="loanYears">Durée du crédit (années)</label><input id="loanYears" data-field="loanYears" type="number" min="1" step="1" inputmode="numeric" value="20"></div>
+          <div class="field"><label for="interestRate">Taux annuel (%)</label><input id="interestRate" data-field="interestRate" type="number" min="0" step="0.01" inputmode="decimal" value="3.6"></div>
+          <div class="field"><label for="surface">Surface du logement (m²)</label><input id="surface" data-field="surface" type="number" min="0" step="0.01" inputmode="decimal" value="19.48"></div>
+          <div class="field"><label for="neighborhoodPrice">Prix moyen du quartier (€/m²)</label><input id="neighborhoodPrice" data-field="neighborhoodPrice" type="number" min="0" step="100" inputmode="decimal" value="5000"></div>
+        </div>
+
+        <h4 class="subsection-title">Calculs de l’opération</h4>
+        <div class="calc-grid" aria-live="polite">
+          <div class="calc-item"><span>Frais de notaire estimés</span><strong id="notaryValue">—</strong></div>
+          <div class="calc-item"><span>Garantie bancaire estimée</span><strong id="guaranteeValue">—</strong></div>
+          <div class="calc-item"><span>Coût total de l’opération</span><strong id="operationCostValue">—</strong></div>
+          <div class="calc-item"><span>Total emprunté</span><strong id="loanAmountValue">—</strong></div>
+          <div class="calc-item"><span>Mensualité estimée</span><strong id="paymentValue">—</strong></div>
+          <div class="calc-item"><span>Prix d’achat au m²</span><strong id="purchasePriceM2">—</strong></div>
+          <div class="calc-item"><span>Coût de l’opération au m²</span><strong id="operationPriceM2">—</strong></div>
+          <div class="calc-item"><span>Valeur moyenne estimée du logement dans le quartier</span><strong id="neighborhoodValue">—</strong></div>
+        </div>
+        <p class="info-note">Notaire : 10 % si le prix du logement est inférieur à 100 000 €, sinon 8 %. Garantie bancaire : 1,5 % de la base utilisée dans le classeur.</p>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <span class="section-kicker">Charges communes</span>
+            <h3>Frais mensuels partagés par les deux scénarios</h3>
+            <p>La taxe foncière et les charges de copropriété sont saisies à l’année puis divisées par 12.</p>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label for="propertyTaxAnnual">Taxe foncière annuelle (€)</label><input id="propertyTaxAnnual" data-field="propertyTaxAnnual" type="number" min="0" step="50" inputmode="decimal" value="780"></div>
+          <div class="field"><label for="coproAnnual">Charges de copropriété annuelles (€)</label><input id="coproAnnual" data-field="coproAnnual" type="number" min="0" step="50" inputmode="decimal" value="1045"></div>
+          <div class="field"><label for="loanInsurance">Assurance de prêt mensuelle (€)</label><input id="loanInsurance" data-field="loanInsurance" type="number" min="0" step="5" inputmode="decimal" value="30"></div>
+          <div class="field"><label for="pnoInsurance">Assurance PNO mensuelle (€)</label><input id="pnoInsurance" data-field="pnoInsurance" type="number" min="0" step="5" inputmode="decimal" value="20"></div>
+        </div>
+      </article>
     </section>
+
+    <section class="block" id="scenarios" aria-labelledby="scenarios-title">
+      <div class="block-heading">
+        <div>
+          <h2 id="scenarios-title">Scénarios locatifs</h2>
+          <p>Recettes, dépenses et indicateurs calculés séparément pour chaque mode de location.</p>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <article class="panel scenario" id="standard">
+          <header class="scenario__head">
+            <h3>Location standard</h3>
+            <p>Loyer mensuel hors charges et charges payées par le locataire.</p>
+          </header>
+          <div class="scenario__body">
+            <div class="field-grid">
+              <div class="field"><label for="standardRent">Loyer mensuel hors charges (€)</label><input id="standardRent" data-field="standardRent" type="number" min="0" step="25" inputmode="decimal" value="700"></div>
+              <div class="field"><label for="standardTenantCharges">Charges locataire mensuelles (€)</label><input id="standardTenantCharges" data-field="standardTenantCharges" type="number" min="0" step="10" inputmode="decimal" value="50"></div>
+              <div class="field"><label for="standardCfeAnnual">CFE annuelle (€)</label><input id="standardCfeAnnual" data-field="standardCfeAnnual" type="number" min="0" step="50" inputmode="decimal" value="0"></div>
+            </div>
+
+            <div class="scenario-results" aria-live="polite">
+              <div class="result-tile"><span>Recettes mensuelles</span><strong id="standardIncome">—</strong></div>
+              <div class="result-tile"><span>Dépenses mensuelles</span><strong id="standardExpenses">—</strong></div>
+              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="standardCashflow">—</strong></div>
+              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="standardRatio">—</strong></div>
+              <div class="result-tile"><span>Rentabilité brute</span><strong id="standardYield">—</strong></div>
+            </div>
+
+            <h4 class="subsection-title">Détail des recettes</h4>
+            <div class="cost-list" id="standardIncomeRows"></div>
+            <h4 class="subsection-title">Détail des dépenses</h4>
+            <div class="cost-list" id="standardExpenseRows"></div>
+          </div>
+        </article>
+
+        <article class="panel scenario scenario--coloc" id="colocation">
+          <header class="scenario__head">
+            <h3>Colocation</h3>
+            <p>Revenu par chambre, nombre de chambres et charges propres à la colocation.</p>
+          </header>
+          <div class="scenario__body">
+            <div class="field-grid">
+              <div class="field"><label for="roomRent">Loyer mensuel par chambre (€)</label><input id="roomRent" data-field="roomRent" type="number" min="0" step="25" inputmode="decimal" value="450"></div>
+              <div class="field"><label for="roomCount">Nombre de chambres</label><input id="roomCount" data-field="roomCount" type="number" min="0" step="1" inputmode="numeric" value="2"></div>
+              <div class="field"><label for="internet">Internet mensuel (€)</label><input id="internet" data-field="internet" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="electricity">Électricité mensuelle (€)</label><input id="electricity" data-field="electricity" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="water">Eau mensuelle (€)</label><input id="water" data-field="water" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="homeInsurance">Assurance logement mensuelle (€)</label><input id="homeInsurance" data-field="homeInsurance" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="cleaning">Ménage mensuel (€)</label><input id="cleaning" data-field="cleaning" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="colocCfeAnnual">CFE annuelle (€)</label><input id="colocCfeAnnual" data-field="colocCfeAnnual" type="number" min="0" step="50" inputmode="decimal" value="0"></div>
+            </div>
+
+            <div class="scenario-results" aria-live="polite">
+              <div class="result-tile"><span>Recettes mensuelles</span><strong id="colocIncome">—</strong></div>
+              <div class="result-tile"><span>Dépenses mensuelles</span><strong id="colocExpenses">—</strong></div>
+              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="colocCashflow">—</strong></div>
+              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="colocRatio">—</strong></div>
+              <div class="result-tile"><span>Rentabilité brute (Excel)</span><strong id="colocYield">—</strong></div>
+            </div>
+
+            <h4 class="subsection-title">Détail des recettes</h4>
+            <div class="cost-list" id="colocIncomeRows"></div>
+            <h4 class="subsection-title">Détail des dépenses</h4>
+            <div class="cost-list" id="colocExpenseRows"></div>
+            <p class="notice">La formule de rentabilité brute de la colocation dans l’Excel pointe vers une plage vide et renvoie 0 %. Cette valeur est conservée pour correspondre au classeur. Le total des charges du site additionne aussi l’eau, l’assurance logement, le ménage et la CFE lorsqu’ils sont renseignés.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>Enregistrement des modifications :</strong> les montants saisis sont conservés dans le navigateur de cet appareil. Ils ne sont pas envoyés au serveur et ne se synchronisent pas entre téléphone et ordinateur.</p>
+      <p>Le classeur fournit des indicateurs, mais ne précise pas de seuil automatique GO / NO GO. Aucun verdict automatique n’est ajouté ici.</p>
+    </footer>
   </main>
-
-  <script>
-    function calculer() {
-      const prix = Number(document.getElementById("prix").value) || 0;
-      const travaux = Number(document.getElementById("travaux").value) || 0;
-      const loyer = Number(document.getElementById("loyer").value) || 0;
-      const charges = Number(document.getElementById("charges").value) || 0;
-      const credit = Number(document.getElementById("credit").value) || 0;
-
-      const coutTotal = prix + travaux;
-      const rendement = coutTotal > 0 ? (loyer * 12 / coutTotal) * 100 : 0;
-      const cashflow = loyer - charges / 12 - credit;
-
-      const euros = valeur =>
-        new Intl.NumberFormat("fr-FR", {
-          style: "currency",
-          currency: "EUR",
-          maximumFractionDigits: 0
-        }).format(valeur);
-
-      document.getElementById("coutTotal").textContent = euros(coutTotal);
-      document.getElementById("rendement").textContent =
-        rendement.toFixed(2).replace(".", ",") + " %";
-      document.getElementById("cashflow").textContent =
-        euros(cashflow) + " / mois";
-
-      const decision = document.getElementById("decision");
-      const go = rendement >= 5 && cashflow > 0;
-
-      decision.className = go ? "go" : "nogo";
-      decision.textContent = go
-        ? "GO selon la règle de démonstration"
-        : "NO GO selon la règle de démonstration";
-    }
-
-    calculer();
-  </script>
 </body>
 </html>
