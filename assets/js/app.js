@@ -171,7 +171,7 @@
     const bottom = 48;
     const plotWidth = width - left - right;
     const plotHeight = height - top - bottom;
-    const maxValue = Math.max(1, ...rows.map((row) => Math.max(row.propertyValue, row.loanBalance)) * 1.06);
+    const maxValue = Math.max(1, ...rows.map((row) => Math.max(row.propertyValue, row.loanBalance))) * 1.06;
     const x = (index) => left + (rows.length === 1 ? plotWidth / 2 : (index / (rows.length - 1)) * plotWidth);
     const y = (value) => top + plotHeight * (1 - Math.max(0, value) / maxValue);
     const valuePath = rows.map((row, index) => (index === 0 ? "M" : "L") + x(index).toFixed(1) + " " + y(row.propertyValue).toFixed(1)).join(" ");
