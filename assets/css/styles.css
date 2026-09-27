@@ -113,3 +113,87 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
   .result-tile { padding: 11px; }
   .result-tile strong { font-size: 1.05rem; }
 }
+
+
+/* Projection du patrimoine : cartes, graphique et tableau responsive */
+.projection-panel { display: grid; gap: 20px; }
+.projection-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
+.projection-controls .field { min-width: 0; }
+.projection-controls .field small { display: block; margin-top: 6px; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.projection-controls .field select { display: block; width: 100%; min-height: 48px; padding: 10px 38px 10px 12px; border: 1px solid #cbd9d0; border-radius: 11px; outline: none; background-color: #fff; color: var(--ink); font: inherit; }
+.projection-controls .field select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(28,103,75,.13); }
+.projection-baseline { grid-column: 1 / -1; margin: 0; padding: 13px 15px; border: 1px solid #dbe9df; border-radius: 13px; background: #f4f9f5; color: var(--muted); font-size: .86rem; }
+.projection-baseline strong { color: var(--green-dark); font-size: 1rem; font-variant-numeric: tabular-nums; }
+.projection-baseline span { font-size: .78rem; }
+.projection-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.projection-summary-card { display: flex; min-width: 0; min-height: 116px; flex-direction: column; justify-content: space-between; gap: 12px; padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: #f7faf8; }
+.projection-summary-card__label { color: var(--muted); font-size: .78rem; font-weight: 650; line-height: 1.4; }
+.projection-summary-card strong { color: var(--ink); font-size: clamp(1rem, 1.8vw, 1.35rem); font-variant-numeric: tabular-nums; line-height: 1.2; overflow-wrap: anywhere; }
+.projection-summary-card--highlight { border-color: #1c674b; background: linear-gradient(140deg, #12392e, #1c674b); }
+.projection-summary-card--highlight .projection-summary-card__label,
+.projection-summary-card--highlight strong { color: #fff; }
+.projection-summary-card--result { border-color: #dcebdd; background: #edf7ef; }
+.projection-summary-card--result strong { color: #1c674b; }
+.projection-chart-card { min-width: 0; padding: clamp(14px, 2.5vw, 20px); border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.projection-chart-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+.projection-chart-card__heading h3,
+.projection-table-heading h3 { margin: 0; font-size: 1rem; }
+.projection-chart-card__heading p,
+.projection-table-heading p { margin: 4px 0 0; color: var(--muted); font-size: .8rem; }
+.projection-legend { display: flex; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; gap: 8px 14px; color: var(--muted); font-size: .75rem; }
+.projection-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.projection-legend__swatch { width: 9px; height: 9px; border-radius: 50%; background: #23745e; }
+.projection-legend__swatch--debt { background: #d29a3a; }
+.wealth-chart { width: 100%; min-width: 0; overflow: hidden; }
+.projection-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.projection-chart__grid { stroke: #e7eeea; stroke-width: 1.4; stroke-dasharray: 5 6; }
+.projection-chart__axis { fill: #718078; font-size: 13px; font-family: inherit; }
+.projection-chart__axis-title { fill: #66776f; font-size: 13px; font-family: inherit; }
+.projection-chart__line { fill: none; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.projection-chart__line--value { stroke: #23745e; }
+.projection-chart__line--debt { stroke: #d29a3a; }
+.projection-chart__dot { stroke: #fff; stroke-width: 2; }
+.projection-chart__dot--value { fill: #23745e; }
+.projection-chart__dot--debt { fill: #d29a3a; }
+.projection-table-heading { margin-top: 2px; }
+.projection-table-scroll { max-width: 100%; overflow: auto; border: 1px solid var(--line); border-radius: 13px; background: #fff; -webkit-overflow-scrolling: touch; scrollbar-color: #a9c3b2 #eff4f0; }
+.projection-table-scroll:focus-visible { outline: 3px solid #8ac8a3; outline-offset: 2px; }
+.projection-table { width: 100%; min-width: 790px; border-collapse: separate; border-spacing: 0; font-size: .8rem; font-variant-numeric: tabular-nums; }
+.projection-table th,
+.projection-table td { padding: 11px 12px; border-bottom: 1px solid #e9efeb; text-align: right; white-space: nowrap; }
+.projection-table thead th { position: sticky; top: 0; z-index: 1; background: #f2f7f3; color: #43574c; font-size: .74rem; font-weight: 750; }
+.projection-table th:first-child,
+.projection-table td:first-child { position: sticky; left: 0; z-index: 2; text-align: left; }
+.projection-table thead th:first-child { z-index: 3; background: #f2f7f3; }
+.projection-table tbody th { background: #fff; color: var(--ink); }
+.projection-table tbody tr:nth-child(even) td { background: #fbfdfb; }
+.projection-table tbody tr:nth-child(even) th:first-child { background: #fbfdfb; }
+.projection-table tbody tr:last-child th,
+.projection-table tbody tr:last-child td { border-bottom: 0; }
+.projection-table .projection-table__gain { color: #1c674b; font-weight: 750; }
+.projection-note { margin: 0; padding: 13px 15px; border-radius: 12px; background: #f5f7f5; color: var(--muted); font-size: .78rem; line-height: 1.55; }
+.projection-note strong { color: var(--ink); }
+
+@media (max-width: 900px) {
+  .projection-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .projection-panel { gap: 16px; }
+  .projection-controls { grid-template-columns: 1fr; gap: 13px; }
+  .projection-baseline { grid-column: auto; }
+  .projection-summary-grid { gap: 9px; }
+  .projection-summary-card { min-height: 104px; padding: 13px; border-radius: 13px; }
+  .projection-summary-card__label { font-size: .74rem; }
+  .projection-summary-card strong { font-size: clamp(.96rem, 4vw, 1.2rem); }
+  .projection-chart-card__heading { flex-direction: column; gap: 9px; }
+  .projection-legend { justify-content: flex-start; }
+  .projection-chart__axis,
+  .projection-chart__axis-title { font-size: 28px; }
+  .projection-table { min-width: 760px; }
+}
+@media (max-width: 390px) {
+  .projection-summary-card { min-height: 100px; padding: 11px; }
+  .projection-summary-card__label { font-size: .7rem; }
+  .projection-chart-card { padding: 12px 9px; }
+  .projection-legend { gap: 8px 11px; font-size: .72rem; }
+}
