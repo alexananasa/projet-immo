@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#12392e">
   <meta name="description" content="Analyse immobilière modifiable avec comparaison location standard et colocation.">
   <title>Analyse immobilière</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
-  <script src="assets/js/app.js?v=8a649c7" defer></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=projection-20260927-01">
+  <script src="assets/js/app.js?v=projection-20260927-01" defer></script>
 </head>
 <body>
   <main class="page-shell">
@@ -27,6 +27,7 @@
       <a href="#operation">Opération & crédit</a>
       <a href="#standard">Location standard</a>
       <a href="#colocation">Colocation</a>
+      <a href="#projection">Patrimoine</a>
       <button class="reset-button" type="button" id="resetButton">Réinitialiser</button>
     </nav>
 
@@ -55,6 +56,91 @@
           <strong class="summary-card__value" id="summaryStandardCashflow">—</strong>
         </article>
       </div>
+    </section>
+
+    <section class="block projection-block" id="projection" aria-labelledby="projection-title">
+      <div class="block-heading">
+        <div>
+          <p class="eyebrow">Projection sur la durée du crédit</p>
+          <h2 id="projection-title">Patrimoine estimé année par année</h2>
+          <p>Visualise l’évolution de la valeur du logement, du crédit restant et de ton patrimoine net avec les paramètres déjà saisis dans l’étude.</p>
+        </div>
+      </div>
+
+      <article class="panel projection-panel">
+        <div class="projection-controls">
+          <div class="field">
+            <label for="annualAppreciationRate">Valorisation annuelle estimée du bien (%)</label>
+            <input id="annualAppreciationRate" data-field="annualAppreciationRate" type="number" min="-100" max="100" step="0.1" inputmode="decimal" value="0.5">
+            <small>Une seule hypothèse par année, modifiable. Exemple : 0,5 % signifie que la valeur progresse de 0,5 % chaque année.</small>
+          </div>
+          <div class="field">
+            <label for="projectionScenario">Scénario de location pour le cash-flow</label>
+            <select id="projectionScenario">
+              <option value="standard">Location standard</option>
+              <option value="colocation">Colocation</option>
+            </select>
+            <small>Le cash-flow mensuel actuel du scénario choisi est prolongé sur chaque année.</small>
+          </div>
+          <p class="projection-baseline">Valeur actuelle de référence : <strong id="projectionBaseValue">—</strong><br><span>Surface du logement × prix moyen au m² du quartier.</span></p>
+        </div>
+
+        <div class="projection-summary-grid" aria-live="polite">
+          <article class="projection-summary-card">
+            <span class="projection-summary-card__label">Valeur estimée au terme du crédit</span>
+            <strong id="projectionEndValue">—</strong>
+          </article>
+          <article class="projection-summary-card">
+            <span class="projection-summary-card__label">Capital restant dû au terme</span>
+            <strong id="projectionEndDebt">—</strong>
+          </article>
+          <article class="projection-summary-card projection-summary-card--highlight">
+            <span class="projection-summary-card__label">Patrimoine net dans le bien au terme</span>
+            <strong id="projectionEndEquity">—</strong>
+          </article>
+          <article class="projection-summary-card projection-summary-card--result">
+            <span class="projection-summary-card__label">Bilan estimé du projet après apport</span>
+            <strong id="projectionEndResult">—</strong>
+          </article>
+        </div>
+
+        <div class="projection-chart-card">
+          <div class="projection-chart-card__heading">
+            <div>
+              <h3>Valeur du bien et capital restant dû</h3>
+              <p>Montants estimés à chaque année du remboursement.</p>
+            </div>
+            <div class="projection-legend" aria-label="Légende du graphique">
+              <span><i class="projection-legend__swatch projection-legend__swatch--value"></i>Valeur estimée</span>
+              <span><i class="projection-legend__swatch projection-legend__swatch--debt"></i>Crédit restant</span>
+            </div>
+          </div>
+          <div id="wealthChart" class="wealth-chart" aria-live="polite"></div>
+        </div>
+
+        <div class="projection-table-heading">
+          <div>
+            <h3>Tableau annuel</h3>
+            <p>Le bilan estimé tient compte du cash-flow cumulé de la <strong id="projectionScenarioName">location standard</strong> et de l’apport saisi.</p>
+          </div>
+        </div>
+        <div class="projection-table-scroll" tabindex="0" role="region" aria-label="Tableau annuel de projection, faire défiler horizontalement pour voir toutes les colonnes">
+          <table class="projection-table">
+            <thead>
+              <tr>
+                <th scope="col">Année</th>
+                <th scope="col">Valeur estimée du bien</th>
+                <th scope="col">Capital restant dû</th>
+                <th scope="col">Patrimoine net dans le bien</th>
+                <th scope="col">Cash-flow cumulé</th>
+                <th scope="col">Bilan estimé du projet</th>
+              </tr>
+            </thead>
+            <tbody id="projectionTableBody"></tbody>
+          </table>
+        </div>
+        <p class="projection-note"><strong>Lecture du calcul :</strong> patrimoine net = valeur estimée du bien − capital restant dû. Bilan estimé = patrimoine net + cash-flow cumulé − apport. La projection prolonge le cash-flow mensuel actuel et ne comprend pas les frais de revente, la fiscalité, la vacance locative ni l’évolution future des loyers et des charges. La plus-value reste théorique tant que le bien n’est pas vendu.</p>
+      </article>
     </section>
 
     <section class="block" id="operation" aria-labelledby="operation-title">
