@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ownsUserData(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function validProperty() {
+      return request.resource.data.keys().hasOnly([
+          'name',
+          'inputs',
+          'projectionScenario',
+          'purchasePrice',
+          'standardCashflow',
+          'colocationCashflow',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'name',
+          'inputs',
+          'projectionScenario',
+          'purchasePrice',
+          'standardCashflow',
+          'colocationCashflow',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.inputs is map
+        && request.resource.data.inputs.size() <= 32
+        && request.resource.data.projectionScenario in ['standard', 'colocation']
+        && request.resource.data.purchasePrice is number
+        && request.resource.data.standardCashflow is number
+        && request.resource.data.colocationCashflow is number
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /users/{userId}/properties/{propertyId} {
+      allow read: if ownsUserData(userId);
+      allow create: if ownsUserData(userId) && validProperty();
+      allow update: if ownsUserData(userId)
+                    && validProperty()
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if ownsUserData(userId);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
