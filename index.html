@@ -7,7 +7,8 @@
   <meta name="description" content="Analyse immobilière modifiable avec comparaison location standard et colocation.">
   <title>Analyse immobilière</title>
   <link rel="stylesheet" href="assets/css/styles.css?v=projection-20260927-02">
-  <script src="assets/js/app.js?v=projection-20260927-02" defer></script>
+  <script src="assets/js/app.js?v=cloud-saves-20260929-01" defer></script>
+  <script type="module" src="assets/js/cloud-saves.js?v=cloud-saves-20260929-01"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -24,6 +25,7 @@
 
     <nav class="section-nav" aria-label="Sections de l’analyse">
       <a href="#synthese">Synthèse</a>
+      <a href="#mes-biens">Mes biens</a>
       <a href="#operation">Opération & crédit</a>
       <a href="#standard">Location standard</a>
       <a href="#colocation">Colocation</a>
@@ -56,6 +58,42 @@
           <strong class="summary-card__value" id="summaryStandardCashflow">—</strong>
         </article>
       </div>
+    </section>
+
+    <section class="block" id="mes-biens" aria-labelledby="saved-title">
+      <div class="block-heading">
+        <div>
+          <h2 id="saved-title">Mes biens sauvegardés</h2>
+          <p>Enregistre une analyse avec un nom pour la retrouver sur ton téléphone et ton ordinateur.</p>
+        </div>
+      </div>
+
+      <article class="panel saved-panel">
+        <div class="saved-account">
+          <div>
+            <span class="section-kicker">Espace personnel</span>
+            <p class="saved-account__identity" id="cloudAccountStatus">Non connecté</p>
+          </div>
+          <div class="saved-account__actions">
+            <button class="saved-button saved-button--primary" type="button" id="googleSignIn">Continuer avec Google</button>
+            <button class="saved-button saved-button--quiet" type="button" id="googleSignOut" hidden>Se déconnecter</button>
+          </div>
+        </div>
+
+        <p class="cloud-status" id="cloudStatus" role="status" aria-live="polite">Connecte-toi pour retrouver tes sauvegardes.</p>
+
+        <form class="saved-form" id="saveAnalysisForm" hidden>
+          <div class="field">
+            <label for="analysisName">Nom de cette analyse</label>
+            <input id="analysisName" name="analysisName" type="text" maxlength="80" placeholder="Ex. Herblay – Centre-ville" autocomplete="off" required>
+          </div>
+          <button class="saved-button saved-button--primary saved-form__submit" type="submit" id="saveAnalysisButton">Enregistrer le bien actuel</button>
+        </form>
+
+        <div class="saved-empty" id="savedEmpty">Connecte-toi avec Google pour enregistrer et retrouver tes analyses sur tes appareils.</div>
+        <div class="saved-list" id="savedList" aria-live="polite"></div>
+        <p class="saved-privacy">Les analyses sont enregistrées dans ton espace Firebase personnel. Seul le compte connecté peut les consulter. Une analyse modifiée doit être enregistrée à nouveau pour mettre à jour tes sauvegardes ; tes valeurs locales restent aussi conservées sur cet appareil.</p>
+      </article>
     </section>
 
     <section class="block projection-block" id="projection" aria-labelledby="projection-title">
@@ -279,7 +317,7 @@
     </section>
 
     <footer class="footer">
-      <p><strong>Enregistrement des modifications :</strong> les montants saisis sont conservés dans le navigateur de cet appareil. Ils ne sont pas envoyés au serveur et ne se synchronisent pas entre téléphone et ordinateur.</p>
+      <p><strong>Enregistrement des modifications :</strong> les modifications sont conservées sur cet appareil. Les analyses enregistrées depuis « Mes biens » se synchronisent dans ton espace Firebase personnel après connexion Google.</p>
       <p><strong>SIMU IMMO GHISALEX</strong></p>
     </footer>
   </main>
