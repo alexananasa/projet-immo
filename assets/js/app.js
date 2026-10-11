@@ -50,7 +50,7 @@
   }
 
   function visibleSpaces(value) {
-    return value.replace(/[\\u202f\\u00a0]/g, " ");
+    return value.replace(/[\u202f\u00a0]/g, " ");
   }
 
   function formatMoney(value) {
@@ -66,12 +66,12 @@
   }
 
   function normalizeNumericText(rawValue) {
-    const compact = String(rawValue).trim().replace(/[\\s\\u00a0\\u202f\\u2009]/g, "");
+    const compact = String(rawValue).trim().replace(/[\s\u00a0\u202f\u2009]/g, "");
     const comma = compact.lastIndexOf(",");
     const dot = compact.lastIndexOf(".");
     if (comma >= 0 && dot >= 0) {
       return comma > dot
-        ? compact.replace(/\\./g, "").replace(/,/g, ".")
+        ? compact.replace(/\./g, "").replace(/,/g, ".")
         : compact.replace(/,/g, "");
     }
     return compact.replace(/,/g, ".");
@@ -85,7 +85,7 @@
 
   function groupedInputValue(value) {
     const parts = String(value).split(".");
-    parts[0] = parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g, " ");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     return parts.join(".");
   }
 
