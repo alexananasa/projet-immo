@@ -360,3 +360,64 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
   min-height: 2.8em;
   line-height: 1.35;
 }
+
+
+/* Calcul d'amortissement LMNP : hypothèses éditables et détail transparent. */
+.amortization-calculator {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #dce9df;
+  border-radius: 14px;
+  background: #fff;
+}
+.amortization-calculator__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, .45fr);
+  align-items: start;
+  gap: 14px;
+}
+.amortization-calculator__heading h4 { margin: 4px 0; color: var(--ink); font-size: 1rem; }
+.amortization-calculator__heading p { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.amortization-calculator__inputs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.amortization-calculator__inputs .field small { display: block; margin-top: 6px; color: var(--muted); font-size: .73rem; line-height: 1.4; }
+.amortization-total {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid #bdd9c7;
+  border-radius: 12px;
+  background: #eef7f0;
+}
+.amortization-total span { color: var(--muted); font-size: .76rem; line-height: 1.35; }
+.amortization-total strong { color: var(--green-dark); font-size: 1.15rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.amortization-breakdown { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.amortization-breakdown__item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: #f3f7f4;
+}
+.amortization-breakdown__item span { color: var(--muted); font-size: .75rem; line-height: 1.35; }
+.amortization-breakdown__item strong { flex: 0 0 auto; color: var(--ink); font-size: .86rem; font-variant-numeric: tabular-nums; text-align: right; }
+.amortization-calculator__notice { margin: 0; color: #52665b; font-size: .76rem; line-height: 1.5; }
+.amortization-calculator__notice strong { color: var(--green-dark); }
+
+@media (max-width: 680px) {
+  .amortization-calculator { padding: 13px; }
+  .amortization-calculator__heading { grid-template-columns: 1fr; }
+  .amortization-calculator__inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .amortization-total { padding: 12px; }
+}
+@media (max-width: 390px) {
+  .amortization-calculator__inputs { grid-template-columns: 1fr; }
+  .amortization-breakdown { grid-template-columns: 1fr; }
+  .amortization-breakdown__item { align-items: flex-start; }
+}
