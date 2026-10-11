@@ -28,7 +28,11 @@
     homeInsurance: 0,
     cleaning: 0,
     colocCfeAnnual: 0,
-    annualAppreciationRate: 0.5
+    annualAppreciationRate: 0.5,
+    taxMarginalRate: "",
+    socialContributionRate: 18.6,
+    annualAdditionalDeductions: 0,
+    annualTaxAmortization: 0
   };
 
   const inputs = [...document.querySelectorAll("[data-field]")];
@@ -55,7 +59,11 @@
 
   function readInputs() {
     return Object.fromEntries(inputs.map((input) => {
-      const value = input.value.trim() === "" ? 0 : Number(input.value);
+      const rawValue = input.value.trim();
+      if (input.dataset.field === "taxMarginalRate" && rawValue === "") {
+        return [input.dataset.field, null];
+      }
+      const value = rawValue === "" ? 0 : Number(rawValue);
       return [input.dataset.field, Number.isFinite(value) ? value : 0];
     }));
   }
@@ -76,7 +84,7 @@
     const guaranteeBase = values.purchasePrice + values.agencyFees + notary + values.works + values.dossierFees;
     const bankGuarantee = guaranteeBase * 0.015;
     const operationCost = guaranteeBase + bankGuarantee + values.brokerageFees;
-    const loanAmount = operationCost - values.contribution;
+    const loanAmount = Math.max(0, operationCost - values.contribution);
     const payment = monthlyPayment(loanAmount, values.interestRate, values.loanYears);
     const propertyTaxMonthly = values.propertyTaxAnnual / 12;
     const coproMonthly = values.coproAnnual / 12;
@@ -109,55 +117,151 @@
     };
   }
 
-  function loanBalanceAtMonth(principal, annualRatePercent, installment, monthsElapsed, monthsTotal) {
-    const startingPrincipal = Math.max(0, principal);
-    if (startingPrincipal === 0 || monthsElapsed <= 0) return startingPrincipal;
-    if (monthsElapsed >= monthsTotal) return 0;
-    const monthlyRate = annualRatePercent / 100 / 12;
-    if (monthlyRate === 0) return Math.max(0, startingPrincipal - installment * monthsElapsed);
-    const growth = Math.pow(1 + monthlyRate, monthsElapsed);
-    const balance = startingPrincipal * growth - installment * (growth - 1) / monthlyRate;
-    return Math.max(0, balance);
+  function buildLoanSchedule(values, calculations) {
+    const monthsTotal = Math.max(1, Math.round(values.loanYears * 12));
+    const yearsTotal = Math.ceil(monthsTotal / 12);
+    const monthlyRate = Math.max(0, values.interestRate) / 100 / 12;
+    let balance = Math.max(0, calculations.loanAmount);
+    const schedule = [{
+      year: 0,
+      balance,
+      principalRepaid: 0,
+      interestPaid: 0,
+      payments: 0
+    }];
+
+    for (let year = 1; year <= yearsTotal; year += 1) {
+      let principalRepaid = 0;
+      let interestPaid = 0;
+      let payments = 0;
+      const monthsThisYear = Math.min(12, monthsTotal - (year - 1) * 12);
+
+      for (let month = 0; month < monthsThisYear && balance > 0; month += 1) {
+        const interest = balance * monthlyRate;
+        const payment = Math.min(Math.max(0, calculations.payment), balance + interest);
+        const principal = Math.min(balance, Math.max(0, payment - interest));
+        balance = Math.max(0, balance - principal);
+        principalRepaid += principal;
+        interestPaid += interest;
+        payments += payment;
+      }
+
+      schedule.push({ year, balance, principalRepaid, interestPaid, payments });
+    }
+    return schedule;
   }
 
+  function annualDeductibleExpenses(values, useColocation) {
+    const amount = (value) => Math.max(0, Number(value) || 0);
+    let total = amount(values.propertyTaxAnnual) + amount(values.coproAnnual)
+      + 12 * (amount(values.loanInsurance) + amount(values.pnoInsurance));
+
+    if (useColocation) {
+      total += 12 * (amount(values.internet) + amount(values.electricity)
+        + amount(values.water) + amount(values.homeInsurance) + amount(values.cleaning));
+      total += amount(values.colocCfeAnnual);
+    } else {
+      total += amount(values.standardCfeAnnual);
+    }
+    return total;
+  }
 
   function renderProjection(values, calculations) {
     const tableBody = document.getElementById("projectionTableBody");
     const chart = document.getElementById("wealthChart");
     if (!tableBody || !chart) return;
 
-    const years = Math.max(1, Math.round(values.loanYears));
-    const monthsTotal = years * 12;
     const annualRate = Math.max(-100, Math.min(100, values.annualAppreciationRate)) / 100;
     const scenarioControl = document.getElementById("projectionScenario");
     const useColocation = scenarioControl && scenarioControl.value === "colocation";
     const monthlyCashflow = useColocation ? calculations.colocCashflow : calculations.standardCashflow;
     const scenarioLabel = useColocation ? "colocation" : "location standard";
+    const annualRent = 12 * (useColocation ? calculations.colocIncome : calculations.standardIncome);
+    const extraDeductions = Math.max(0, Number(values.annualAdditionalDeductions) || 0);
+    const requestedAmortization = Math.max(0, Number(values.annualTaxAmortization) || 0);
+    const marginalRate = Number.isFinite(values.taxMarginalRate)
+      ? Math.max(0, Math.min(45, values.taxMarginalRate)) / 100
+      : null;
+    const socialRate = Math.max(0, Math.min(50, Number(values.socialContributionRate) || 0)) / 100;
+    const schedule = buildLoanSchedule(values, calculations);
+    const years = schedule.length - 1;
+    let cumulativeCashflow = 0;
 
-    const rows = Array.from({ length: years + 1 }, (_, year) => {
+    const rows = schedule.map((loanRow, year) => {
       const propertyValue = calculations.neighborhoodValue * Math.pow(1 + annualRate, year);
-      const elapsedMonths = Math.min(year * 12, monthsTotal);
-      const loanBalance = loanBalanceAtMonth(
-        calculations.loanAmount, values.interestRate, calculations.payment, elapsedMonths, monthsTotal
+      const propertyEquity = propertyValue - loanRow.balance;
+      const grossRent = year === 0 ? 0 : annualRent;
+      const ordinaryDeductions = year === 0 ? 0 : annualDeductibleExpenses(values, useColocation);
+      const otherPaidDeductions = year === 0 ? 0 : extraDeductions;
+      const resultBeforeAmortization = grossRent - ordinaryDeductions
+        - loanRow.interestPaid - otherPaidDeductions;
+      const amortizationUsed = Math.min(
+        Math.max(0, resultBeforeAmortization),
+        year === 0 ? 0 : requestedAmortization
       );
-      const propertyEquity = propertyValue - loanBalance;
-      const cumulativeCashflow = monthlyCashflow * year * 12;
+      const taxableResult = resultBeforeAmortization - amortizationUsed;
+      const taxableBase = Math.max(0, taxableResult);
+      const incomeTax = marginalRate === null ? 0 : taxableBase * marginalRate;
+      const socialContributions = taxableBase * socialRate;
+      const totalTax = incomeTax + socialContributions;
+      const deductions = ordinaryDeductions + loanRow.interestPaid
+        + otherPaidDeductions + amortizationUsed;
+      const annualCashflowAfterTax = year === 0
+        ? 0
+        : monthlyCashflow * 12 - otherPaidDeductions - totalTax;
+
+      cumulativeCashflow += annualCashflowAfterTax;
       const projectResult = propertyEquity + cumulativeCashflow - values.contribution;
-      return { year, propertyValue, loanBalance, propertyEquity, cumulativeCashflow, projectResult };
+      return {
+        year,
+        propertyValue,
+        loanBalance: loanRow.balance,
+        principalRepaid: loanRow.principalRepaid,
+        interestPaid: loanRow.interestPaid,
+        loanPayments: loanRow.payments,
+        grossRent,
+        deductions,
+        taxableResult,
+        incomeTax,
+        socialContributions,
+        totalTax,
+        afterTaxMonthlyCashflow: annualCashflowAfterTax / 12,
+        cumulativeCashflow,
+        propertyEquity,
+        projectResult
+      };
     });
 
     const finalRow = rows[rows.length - 1];
+    const firstOperatingYear = rows[1] || rows[0];
     setText("projectionBaseValue", formatMoney(calculations.neighborhoodValue));
     setText("projectionScenarioName", scenarioLabel);
     setText("projectionEndValue", formatMoney(finalRow.propertyValue));
     setText("projectionEndDebt", formatMoney(finalRow.loanBalance));
     setText("projectionEndEquity", formatMoney(finalRow.propertyEquity));
     setText("projectionEndResult", formatMoney(finalRow.projectResult));
+    setText("taxGrossRentYear1", formatMoney(firstOperatingYear.grossRent));
+    setText("taxDeductionsYear1", formatMoney(firstOperatingYear.deductions));
+    setText("taxableBicYear1", formatMoney(firstOperatingYear.taxableResult));
+    setText("taxIncomeYear1", formatMoney(firstOperatingYear.incomeTax));
+    setText("taxSocialYear1", formatMoney(firstOperatingYear.socialContributions));
+    setText("taxNetMonthlyYear1", formatMoney(firstOperatingYear.afterTaxMonthlyCashflow));
+    const tmiInput = document.getElementById("taxMarginalRate");
+    setText("taxEstimateNotice", !tmiInput || tmiInput.value.trim() === ""
+      ? "Saisis ton taux marginal d’imposition pour estimer l’impôt sur le revenu ; les prélèvements sociaux affichés restent une estimation."
+      : "Estimation simplifiée : vérifie le taux et les charges admises avec ton comptable.");
 
     tableBody.innerHTML = rows.map((row) =>
       '<tr><th scope="row">' + row.year + '</th>' +
-      '<td>' + formatMoney(row.propertyValue) + '</td>' +
+      '<td>' + formatMoney(row.grossRent) + '</td>' +
+      '<td>' + formatMoney(row.principalRepaid) + '</td>' +
+      '<td>' + formatMoney(row.interestPaid) + '</td>' +
       '<td>' + formatMoney(row.loanBalance) + '</td>' +
+      '<td>' + formatMoney(Math.max(0, row.deductions - row.interestPaid)) + '</td>' +
+      '<td>' + formatMoney(row.taxableResult) + '</td>' +
+      '<td>' + formatMoney(row.totalTax) + '</td>' +
+      '<td>' + formatMoney(row.afterTaxMonthlyCashflow) + '</td>' +
+      '<td>' + formatMoney(row.propertyValue) + '</td>' +
       '<td>' + formatMoney(row.propertyEquity) + '</td>' +
       '<td>' + formatMoney(row.cumulativeCashflow) + '</td>' +
       '<td class="projection-table__gain">' + formatMoney(row.projectResult) + '</td></tr>'
