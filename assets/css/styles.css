@@ -176,6 +176,7 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
 
 @media (max-width: 900px) {
   .projection-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tax-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 680px) {
   .projection-panel { gap: 16px; }
@@ -189,15 +190,32 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
   .projection-legend { justify-content: flex-start; }
   .projection-chart__axis,
   .projection-chart__axis-title { font-size: 28px; }
-  .projection-table { min-width: 760px; }
+  .projection-table { min-width: 1180px; }
+  .tax-estimator__inputs { grid-template-columns: 1fr; }
 }
 @media (max-width: 390px) {
   .projection-summary-card { min-height: 100px; padding: 11px; }
   .projection-summary-card__label { font-size: .7rem; }
   .projection-chart-card { padding: 12px 9px; }
   .projection-legend { gap: 8px 11px; font-size: .72rem; }
+  .tax-summary-grid { grid-template-columns: 1fr; }
 }
 
+
+/* Estimation fiscale LMNP et résultats après impôts */
+.tax-estimator { display: grid; gap: 15px; padding: clamp(16px, 2.5vw, 22px); border: 1px solid #dce9df; border-radius: 16px; background: #f8fbf8; }
+.tax-estimator__heading h3 { margin: 2px 0 0; font-size: 1.05rem; }
+.tax-estimator__heading p { margin: 4px 0 0; color: var(--muted); font-size: .82rem; }
+.tax-estimator__inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tax-estimator__inputs .field small { display: block; margin-top: 6px; color: var(--muted); font-size: .75rem; line-height: 1.45; }
+.tax-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.tax-summary-card { display: flex; min-width: 0; min-height: 92px; flex-direction: column; justify-content: space-between; gap: 9px; padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.tax-summary-card span { color: var(--muted); font-size: .75rem; line-height: 1.35; }
+.tax-summary-card strong { color: var(--ink); font-size: 1rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.tax-summary-card--highlight { border-color: #1c674b; background: var(--green-pale); }
+.tax-summary-card--highlight strong { color: var(--green-dark); }
+.tax-estimate-notice { margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff4d9; color: #80531b; font-size: .78rem; }
+.tax-estimator__note { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.5; }
 
 /* Espace personnel des analyses sauvegardées dans le cloud */
 .saved-panel { display: grid; gap: 16px; }

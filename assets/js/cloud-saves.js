@@ -77,7 +77,12 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
   function readAnalysis() {
     const inputs = {};
     appInputs.forEach((input) => {
-      const parsed = input.value.trim() === "" ? 0 : Number(input.value);
+      const rawValue = input.value.trim();
+      if (input.dataset.field === "taxMarginalRate" && rawValue === "") {
+        inputs[input.dataset.field] = null;
+        return;
+      }
+      const parsed = rawValue === "" ? 0 : Number(rawValue);
       inputs[input.dataset.field] = Number.isFinite(parsed) ? parsed : 0;
     });
     return {
@@ -168,7 +173,11 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
         }
         appInputs.forEach((input) => {
           const value = record.inputs[input.dataset.field];
-          if (typeof value === "number" && Number.isFinite(value)) input.value = String(value);
+          if (input.dataset.field === "taxMarginalRate" && (value === null || value === undefined)) {
+            input.value = "";
+          } else if (typeof value === "number" && Number.isFinite(value)) {
+            input.value = String(value);
+          }
         });
         const scenario = document.getElementById("projectionScenario");
         if (scenario && (record.projectionScenario === "standard" || record.projectionScenario === "colocation")) {
