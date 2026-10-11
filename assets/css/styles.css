@@ -343,3 +343,7 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
   .scenario-editor > summary { min-height: 52px; padding: 11px 12px; }
   .scenario-editor__content { padding: 0 12px 14px; }
 }
+
+
+/* Do not apply the stacked-panel gap to cards in a side-by-side scenario grid. */
+.two-column > .panel + .panel { margin-top: 0; }
