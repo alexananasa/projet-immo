@@ -421,3 +421,17 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
   .amortization-breakdown { grid-template-columns: 1fr; }
   .amortization-breakdown__item { align-items: flex-start; }
 }
+
+.amortization-calculated-value {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid #bdd9c7;
+  border-radius: 11px;
+  background: #eef7f0;
+  color: var(--green-dark);
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
