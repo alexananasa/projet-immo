@@ -77,7 +77,12 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
   function readAnalysis() {
     const inputs = {};
     appInputs.forEach((input) => {
-      const parsed = input.value.trim() === "" ? 0 : Number(input.value);
+      const rawValue = input.value.trim();
+      if (input.dataset.field === "taxMarginalRate" && rawValue === "") {
+        inputs[input.dataset.field] = null;
+        return;
+      }
+      const parsed = rawValue === "" ? 0 : Number(rawValue);
       inputs[input.dataset.field] = Number.isFinite(parsed) ? parsed : 0;
     });
     return {
