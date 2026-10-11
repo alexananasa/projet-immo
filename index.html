@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#12392e">
   <meta name="description" content="Analyse immobilière modifiable avec comparaison location standard et colocation.">
   <title>Analyse immobilière</title>
-  <link rel="stylesheet" href="assets/css/styles.css?v=loan-tax-20261011-01">
-  <script src="assets/js/app.js?v=loan-tax-20261011-01" defer></script>
-  <script type="module" src="assets/js/cloud-saves.js?v=loan-tax-20261011-01"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=decimal-input-20261011-01">
+  <script src="assets/js/app.js?v=decimal-input-20261011-01" defer></script>
+  <script type="module" src="assets/js/cloud-saves.js?v=decimal-input-20261011-01"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -17,7 +17,7 @@
         <div>
           <p class="eyebrow">Étude immobilière</p>
           <h1>Analyse d’investissement</h1>
-          <p class="hero__text">Modifie les paramètres du bien et compare en direct la location standard et la colocation.</p>
+          <p class="hero__text">Modifie les paramètres du bien et compare en direct la location standard et la colocation. Les champs numériques acceptent la virgule ou le point pour les décimales ; les milliers sont espacés automatiquement.</p>
         </div>
         <span class="local-state" id="saveState" role="status">Valeurs de départ du classeur</span>
       </div>
@@ -110,7 +110,7 @@
         <div class="projection-controls">
           <div class="field">
             <label for="annualAppreciationRate">Valorisation annuelle estimée du bien (%)</label>
-            <input id="annualAppreciationRate" data-field="annualAppreciationRate" type="number" min="-100" max="100" step="0.1" inputmode="decimal" value="0.5">
+            <input id="annualAppreciationRate" data-field="annualAppreciationRate" type="text" inputmode="decimal" value="0.5" spellcheck="false">
             <small>Une seule hypothèse par année, modifiable. Exemple : 0,5 % signifie que la valeur progresse de 0,5 % chaque année.</small>
           </div>
           <div class="field">
@@ -135,22 +135,22 @@
           <div class="field-grid tax-estimator__inputs">
             <div class="field">
               <label for="taxMarginalRate">Ton taux marginal d’imposition (TMI) (%)</label>
-              <input id="taxMarginalRate" data-field="taxMarginalRate" type="number" min="0" max="45" step="1" inputmode="decimal" placeholder="Ex. 11">
+              <input id="taxMarginalRate" data-field="taxMarginalRate" type="text" inputmode="decimal" placeholder="Ex. 11" spellcheck="false">
               <small>À saisir pour estimer l’impôt sur le revenu. L’estimation ne calcule pas tout le barème du foyer.</small>
             </div>
             <div class="field">
               <label for="socialContributionRate">Taux des prélèvements sociaux estimé (%)</label>
-              <input id="socialContributionRate" data-field="socialContributionRate" type="number" min="0" max="50" step="0.1" inputmode="decimal" value="18.6">
+              <input id="socialContributionRate" data-field="socialContributionRate" type="text" inputmode="decimal" value="18.6" spellcheck="false">
               <small>Valeur initiale pour une estimation LMNP ; modifie-la si ton comptable confirme un autre taux.</small>
             </div>
             <div class="field">
               <label for="annualAdditionalDeductions">Travaux et autres charges payés et déductibles en plus (€/an)</label>
-              <input id="annualAdditionalDeductions" data-field="annualAdditionalDeductions" type="number" min="0" step="100" inputmode="decimal" value="0">
+              <input id="annualAdditionalDeductions" data-field="annualAdditionalDeductions" type="text" inputmode="decimal" value="0" spellcheck="false">
               <small>Saisis seulement le montant admis par ton comptable, hors charges déjà renseignées. Il est aussi retiré de la trésorerie.</small>
             </div>
             <div class="field">
               <label for="annualTaxAmortization">Amortissement fiscal annuel estimé par ton comptable (€)</label>
-              <input id="annualTaxAmortization" data-field="annualTaxAmortization" type="number" min="0" step="100" inputmode="decimal" value="0">
+              <input id="annualTaxAmortization" data-field="annualTaxAmortization" type="text" inputmode="decimal" value="0" spellcheck="false">
               <small>Déduction comptable non décaissée cette année ; elle ne réduit donc pas le cash-flow réel.</small>
             </div>
           </div>
@@ -266,20 +266,20 @@
           </div>
         </div>
         <div class="field-grid">
-          <div class="field"><label for="purchasePrice">Prix de l’appartement (€)</label><input id="purchasePrice" data-field="purchasePrice" type="number" min="0" step="1000" inputmode="decimal" value="80000"></div>
-          <div class="field"><label for="agencyFees">Frais d’agence (€)</label><input id="agencyFees" data-field="agencyFees" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
-          <div class="field"><label for="works">Travaux (€)</label><input id="works" data-field="works" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
-          <div class="field"><label for="dossierFees">Frais de dossier (€)</label><input id="dossierFees" data-field="dossierFees" type="number" min="0" step="50" inputmode="decimal" value="500"></div>
-          <div class="field"><label for="brokerageFees">Frais de courtage (€)</label><input id="brokerageFees" data-field="brokerageFees" type="number" min="0" step="100" inputmode="decimal" value="0"></div>
-          <div class="field"><label for="contribution">Apport personnel (€)</label><input id="contribution" data-field="contribution" type="number" min="0" step="1000" inputmode="decimal" value="0"></div>
+          <div class="field"><label for="purchasePrice">Prix de l’appartement (€)</label><input id="purchasePrice" data-field="purchasePrice" type="text" inputmode="decimal" value="80000" spellcheck="false"></div>
+          <div class="field"><label for="agencyFees">Frais d’agence (€)</label><input id="agencyFees" data-field="agencyFees" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+          <div class="field"><label for="works">Travaux (€)</label><input id="works" data-field="works" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+          <div class="field"><label for="dossierFees">Frais de dossier (€)</label><input id="dossierFees" data-field="dossierFees" type="text" inputmode="decimal" value="500" spellcheck="false"></div>
+          <div class="field"><label for="brokerageFees">Frais de courtage (€)</label><input id="brokerageFees" data-field="brokerageFees" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+          <div class="field"><label for="contribution">Apport personnel (€)</label><input id="contribution" data-field="contribution" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
         </div>
 
         <h4 class="subsection-title">Financement et marché</h4>
         <div class="field-grid">
-          <div class="field"><label for="loanYears">Durée du crédit (années)</label><input id="loanYears" data-field="loanYears" type="number" min="1" step="1" inputmode="numeric" value="20"></div>
-          <div class="field"><label for="interestRate">Taux annuel (%)</label><input id="interestRate" data-field="interestRate" type="number" min="0" step="0.01" inputmode="decimal" value="3.6"></div>
-          <div class="field"><label for="surface">Surface du logement (m²)</label><input id="surface" data-field="surface" type="number" min="0" step="0.01" inputmode="decimal" value="19.48"></div>
-          <div class="field"><label for="neighborhoodPrice">Prix moyen du quartier (€/m²)</label><input id="neighborhoodPrice" data-field="neighborhoodPrice" type="number" min="0" step="100" inputmode="decimal" value="5000"></div>
+          <div class="field"><label for="loanYears">Durée du crédit (années)</label><input id="loanYears" data-field="loanYears" type="text" inputmode="numeric" value="20" spellcheck="false"></div>
+          <div class="field"><label for="interestRate">Taux annuel (%)</label><input id="interestRate" data-field="interestRate" type="text" inputmode="decimal" value="3.6" spellcheck="false"></div>
+          <div class="field"><label for="surface">Surface du logement (m²)</label><input id="surface" data-field="surface" type="text" inputmode="decimal" value="19.48" spellcheck="false"></div>
+          <div class="field"><label for="neighborhoodPrice">Prix moyen du quartier (€/m²)</label><input id="neighborhoodPrice" data-field="neighborhoodPrice" type="text" inputmode="decimal" value="5000" spellcheck="false"></div>
         </div>
 
         <h4 class="subsection-title">Calculs de l’opération</h4>
@@ -305,10 +305,10 @@
           </div>
         </div>
         <div class="field-grid">
-          <div class="field"><label for="propertyTaxAnnual">Taxe foncière annuelle (€)</label><input id="propertyTaxAnnual" data-field="propertyTaxAnnual" type="number" min="0" step="50" inputmode="decimal" value="780"></div>
-          <div class="field"><label for="coproAnnual">Charges de copropriété annuelles (€)</label><input id="coproAnnual" data-field="coproAnnual" type="number" min="0" step="50" inputmode="decimal" value="1045"></div>
-          <div class="field"><label for="loanInsurance">Assurance de prêt mensuelle (€)</label><input id="loanInsurance" data-field="loanInsurance" type="number" min="0" step="5" inputmode="decimal" value="30"></div>
-          <div class="field"><label for="pnoInsurance">Assurance PNO mensuelle (€)</label><input id="pnoInsurance" data-field="pnoInsurance" type="number" min="0" step="5" inputmode="decimal" value="20"></div>
+          <div class="field"><label for="propertyTaxAnnual">Taxe foncière annuelle (€)</label><input id="propertyTaxAnnual" data-field="propertyTaxAnnual" type="text" inputmode="decimal" value="780" spellcheck="false"></div>
+          <div class="field"><label for="coproAnnual">Charges de copropriété annuelles (€)</label><input id="coproAnnual" data-field="coproAnnual" type="text" inputmode="decimal" value="1045" spellcheck="false"></div>
+          <div class="field"><label for="loanInsurance">Assurance de prêt mensuelle (€)</label><input id="loanInsurance" data-field="loanInsurance" type="text" inputmode="decimal" value="30" spellcheck="false"></div>
+          <div class="field"><label for="pnoInsurance">Assurance PNO mensuelle (€)</label><input id="pnoInsurance" data-field="pnoInsurance" type="text" inputmode="decimal" value="20" spellcheck="false"></div>
         </div>
       </article>
     </section>
@@ -329,9 +329,9 @@
           </header>
           <div class="scenario__body">
             <div class="field-grid">
-              <div class="field"><label for="standardRent">Loyer mensuel hors charges (€)</label><input id="standardRent" data-field="standardRent" type="number" min="0" step="25" inputmode="decimal" value="700"></div>
-              <div class="field"><label for="standardTenantCharges">Charges locataire mensuelles (€)</label><input id="standardTenantCharges" data-field="standardTenantCharges" type="number" min="0" step="10" inputmode="decimal" value="50"></div>
-              <div class="field"><label for="standardCfeAnnual">CFE annuelle (€)</label><input id="standardCfeAnnual" data-field="standardCfeAnnual" type="number" min="0" step="50" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="standardRent">Loyer mensuel hors charges (€)</label><input id="standardRent" data-field="standardRent" type="text" inputmode="decimal" value="700" spellcheck="false"></div>
+              <div class="field"><label for="standardTenantCharges">Charges locataire mensuelles (€)</label><input id="standardTenantCharges" data-field="standardTenantCharges" type="text" inputmode="decimal" value="50" spellcheck="false"></div>
+              <div class="field"><label for="standardCfeAnnual">CFE annuelle (€)</label><input id="standardCfeAnnual" data-field="standardCfeAnnual" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
             </div>
 
             <div class="scenario-results" aria-live="polite">
@@ -356,14 +356,14 @@
           </header>
           <div class="scenario__body">
             <div class="field-grid">
-              <div class="field"><label for="roomRent">Loyer mensuel par chambre (€)</label><input id="roomRent" data-field="roomRent" type="number" min="0" step="25" inputmode="decimal" value="450"></div>
-              <div class="field"><label for="roomCount">Nombre de chambres</label><input id="roomCount" data-field="roomCount" type="number" min="0" step="1" inputmode="numeric" value="2"></div>
-              <div class="field"><label for="internet">Internet mensuel (€)</label><input id="internet" data-field="internet" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
-              <div class="field"><label for="electricity">Électricité mensuelle (€)</label><input id="electricity" data-field="electricity" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
-              <div class="field"><label for="water">Eau mensuelle (€)</label><input id="water" data-field="water" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
-              <div class="field"><label for="homeInsurance">Assurance logement mensuelle (€)</label><input id="homeInsurance" data-field="homeInsurance" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
-              <div class="field"><label for="cleaning">Ménage mensuel (€)</label><input id="cleaning" data-field="cleaning" type="number" min="0" step="5" inputmode="decimal" value="0"></div>
-              <div class="field"><label for="colocCfeAnnual">CFE annuelle (€)</label><input id="colocCfeAnnual" data-field="colocCfeAnnual" type="number" min="0" step="50" inputmode="decimal" value="0"></div>
+              <div class="field"><label for="roomRent">Loyer mensuel par chambre (€)</label><input id="roomRent" data-field="roomRent" type="text" inputmode="decimal" value="450" spellcheck="false"></div>
+              <div class="field"><label for="roomCount">Nombre de chambres</label><input id="roomCount" data-field="roomCount" type="text" inputmode="numeric" value="2" spellcheck="false"></div>
+              <div class="field"><label for="internet">Internet mensuel (€)</label><input id="internet" data-field="internet" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+              <div class="field"><label for="electricity">Électricité mensuelle (€)</label><input id="electricity" data-field="electricity" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+              <div class="field"><label for="water">Eau mensuelle (€)</label><input id="water" data-field="water" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+              <div class="field"><label for="homeInsurance">Assurance logement mensuelle (€)</label><input id="homeInsurance" data-field="homeInsurance" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+              <div class="field"><label for="cleaning">Ménage mensuel (€)</label><input id="cleaning" data-field="cleaning" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
+              <div class="field"><label for="colocCfeAnnual">CFE annuelle (€)</label><input id="colocCfeAnnual" data-field="colocCfeAnnual" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
             </div>
 
             <div class="scenario-results" aria-live="polite">

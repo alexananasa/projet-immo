@@ -74,16 +74,28 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
     return "Une erreur Firebase est survenue. Vérifie la configuration du projet puis réessaie.";
   }
 
+  function parseNumericInput(rawValue) {
+    const compact = String(rawValue).trim().replace(/[\s\u00a0\u202f\u2009]/g, "");
+    if (compact === "") return null;
+    const comma = compact.lastIndexOf(",");
+    const dot = compact.lastIndexOf(".");
+    const normalized = comma >= 0 && dot >= 0
+      ? (comma > dot ? compact.replace(/\./g, "").replace(/,/g, ".") : compact.replace(/,/g, ""))
+      : compact.replace(/,/g, ".");
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
   function readAnalysis() {
     const inputs = {};
     appInputs.forEach((input) => {
       const rawValue = input.value.trim();
+      const parsed = parseNumericInput(rawValue);
       if (input.dataset.field === "taxMarginalRate" && rawValue === "") {
         inputs[input.dataset.field] = null;
         return;
       }
-      const parsed = rawValue === "" ? 0 : Number(rawValue);
-      inputs[input.dataset.field] = Number.isFinite(parsed) ? parsed : 0;
+      inputs[input.dataset.field] = parsed === null ? 0 : parsed;
     });
     return {
       inputs,
@@ -158,9 +170,9 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
     const metrics = document.createElement("div");
     metrics.className = "saved-card__metrics";
     metrics.append(
-      makeMetric("Prix d’achat", money.format(Number(record.purchasePrice) || 0)),
-      makeMetric("Cash-flow · standard", money.format(Number(record.standardCashflow) || 0)),
-      makeMetric("Cash-flow · colocation", money.format(Number(record.colocationCashflow) || 0))
+      makeMetric("Prix d’achat", money.format(Number(record.purchasePrice) || 0).replace(/[\u202f\u00a0]/g, " ")),
+      makeMetric("Cash-flow · standard", money.format(Number(record.standardCashflow) || 0).replace(/[\u202f\u00a0]/g, " ")),
+      makeMetric("Cash-flow · colocation", money.format(Number(record.colocationCashflow) || 0).replace(/[\u202f\u00a0]/g, " "))
     );
 
     const actions = document.createElement("div");
@@ -179,6 +191,7 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
             input.value = String(value);
           }
         });
+        appInputs.forEach((input) => input.dispatchEvent(new Event("blur")));
         const scenario = document.getElementById("projectionScenario");
         if (scenario && (record.projectionScenario === "standard" || record.projectionScenario === "colocation")) {
           scenario.value = record.projectionScenario;

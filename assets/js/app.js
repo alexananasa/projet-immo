@@ -49,12 +49,74 @@
     if (element) element.textContent = value;
   }
 
+  function visibleSpaces(value) {
+    return value.replace(/[\u202f\u00a0]/g, " ");
+  }
+
   function formatMoney(value) {
-    return money.format(Number.isFinite(value) ? value : 0);
+    return visibleSpaces(money.format(Number.isFinite(value) ? value : 0));
   }
 
   function formatPercent(value) {
-    return percent.format(Number.isFinite(value) ? value : 0);
+    return visibleSpaces(percent.format(Number.isFinite(value) ? value : 0));
+  }
+
+  function formatPlainNumber(value) {
+    return visibleSpaces(plainNumber.format(Number.isFinite(value) ? value : 0));
+  }
+
+  function normalizeNumericText(rawValue) {
+    const compact = String(rawValue).trim().replace(/[\s\u00a0\u202f\u2009]/g, "");
+    const comma = compact.lastIndexOf(",");
+    const dot = compact.lastIndexOf(".");
+    if (comma >= 0 && dot >= 0) {
+      return comma > dot
+        ? compact.replace(/\./g, "").replace(/,/g, ".")
+        : compact.replace(/,/g, "");
+    }
+    return compact.replace(/,/g, ".");
+  }
+
+  function parseNumericInput(rawValue) {
+    if (String(rawValue).trim() === "") return null;
+    const value = Number(normalizeNumericText(rawValue));
+    return Number.isFinite(value) ? value : null;
+  }
+
+  function groupedInputValue(value) {
+    const parts = String(value).split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return parts.join(".");
+  }
+
+  function formatNumericInput(input) {
+    const value = parseNumericInput(input.value);
+    if (value !== null) input.value = groupedInputValue(value);
+  }
+
+  function prepareNumericInput(input) {
+    const before = input.value;
+    const cursor = input.selectionStart;
+    const normalized = normalizeNumericText(before);
+    input.value = normalized;
+    if (cursor !== null) {
+      const prefix = normalizeNumericText(before.slice(0, cursor));
+      const position = Math.min(prefix.length, normalized.length);
+      input.setSelectionRange(position, position);
+    }
+  }
+
+  function normalizeTypedNumber(input) {
+    const before = input.value;
+    const cursor = input.selectionStart;
+    const normalized = normalizeNumericText(before);
+    if (normalized === before) return;
+    input.value = normalized;
+    if (cursor !== null) {
+      const prefix = normalizeNumericText(before.slice(0, cursor));
+      const position = Math.min(prefix.length, normalized.length);
+      input.setSelectionRange(position, position);
+    }
   }
 
   function readInputs() {
@@ -63,8 +125,8 @@
       if (input.dataset.field === "taxMarginalRate" && rawValue === "") {
         return [input.dataset.field, null];
       }
-      const value = rawValue === "" ? 0 : Number(rawValue);
-      return [input.dataset.field, Number.isFinite(value) ? value : 0];
+      const parsed = parseNumericInput(rawValue);
+      return [input.dataset.field, parsed === null ? 0 : parsed];
     }));
   }
 
@@ -284,7 +346,7 @@
     const grid = Array.from({ length: 5 }, (_, index) => {
       const fraction = index / 4;
       const gridY = top + plotHeight * fraction;
-      const label = plainNumber.format((maxValue * (1 - fraction)) / 1000) + " k€";
+      const label = formatPlainNumber((maxValue * (1 - fraction)) / 1000) + " k€";
       return '<line class="projection-chart__grid" x1="' + left + '" y1="' + gridY.toFixed(1) + '" x2="' + (width - right) + '" y2="' + gridY.toFixed(1) + '" />' +
         '<text class="projection-chart__axis" x="' + (left - 10) + '" y="' + (gridY + 4).toFixed(1) + '" text-anchor="end">' + label + '</text>';
     }).join("");
@@ -408,8 +470,14 @@
   }
 
   inputs.forEach((input) => {
+    input.addEventListener("focus", () => prepareNumericInput(input));
     input.addEventListener("input", () => {
+      normalizeTypedNumber(input);
       render();
+      saveValues();
+    });
+    input.addEventListener("blur", () => {
+      formatNumericInput(input);
       saveValues();
     });
   });
@@ -427,6 +495,7 @@
     resetButton.addEventListener("click", () => {
       inputs.forEach((input) => {
         input.value = String(DEFAULTS[input.dataset.field] ?? 0);
+        formatNumericInput(input);
       });
       try {
         localStorage.removeItem(STORAGE_KEY);
@@ -439,6 +508,7 @@
   }
 
   const restored = restoreValues();
+  inputs.forEach(formatNumericInput);
   render();
   setText("saveState", restored ? "Valeurs sauvegardées sur cet appareil" : "Valeurs de départ du classeur");
 })();
