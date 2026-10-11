@@ -75,12 +75,12 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
   }
 
   function parseNumericInput(rawValue) {
-    const compact = String(rawValue).trim().replace(/[\\s\\u00a0\\u202f\\u2009]/g, "");
+    const compact = String(rawValue).trim().replace(/[\s\u00a0\u202f\u2009]/g, "");
     if (compact === "") return null;
     const comma = compact.lastIndexOf(",");
     const dot = compact.lastIndexOf(".");
     const normalized = comma >= 0 && dot >= 0
-      ? (comma > dot ? compact.replace(/\\./g, "").replace(/,/g, ".") : compact.replace(/,/g, ""))
+      ? (comma > dot ? compact.replace(/\./g, "").replace(/,/g, ".") : compact.replace(/,/g, ""))
       : compact.replace(/,/g, ".");
     const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : null;
@@ -170,9 +170,9 @@ import { firebaseConfig, firebaseReady } from "./firebase-config.js";
     const metrics = document.createElement("div");
     metrics.className = "saved-card__metrics";
     metrics.append(
-      makeMetric("Prix d’achat", money.format(Number(record.purchasePrice) || 0).replace(/[\\u202f\\u00a0]/g, " ")),
-      makeMetric("Cash-flow · standard", money.format(Number(record.standardCashflow) || 0).replace(/[\\u202f\\u00a0]/g, " ")),
-      makeMetric("Cash-flow · colocation", money.format(Number(record.colocationCashflow) || 0).replace(/[\\u202f\\u00a0]/g, " "))
+      makeMetric("Prix d’achat", money.format(Number(record.purchasePrice) || 0).replace(/[\u202f\u00a0]/g, " ")),
+      makeMetric("Cash-flow · standard", money.format(Number(record.standardCashflow) || 0).replace(/[\u202f\u00a0]/g, " ")),
+      makeMetric("Cash-flow · colocation", money.format(Number(record.colocationCashflow) || 0).replace(/[\u202f\u00a0]/g, " "))
     );
 
     const actions = document.createElement("div");
