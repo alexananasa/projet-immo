@@ -32,7 +32,12 @@
     taxMarginalRate: "",
     socialContributionRate: 18.6,
     annualAdditionalDeductions: 0,
-    annualTaxAmortization: 0
+    landSharePercent: 15,
+    buildingUsefulLifeYears: 30,
+    capitalizedWorks: 0,
+    capitalizedWorksUsefulLifeYears: 15,
+    furnitureAssetValue: 0,
+    furnitureUsefulLifeYears: 7
   };
 
   const inputs = [...document.querySelectorAll("[data-field]")];
@@ -179,6 +184,33 @@
     };
   }
 
+  function estimateTaxAmortization(values, calculations) {
+    const nonNegative = (value) => Math.max(0, Number(value) || 0);
+    const landShare = Math.max(0, Math.min(100, Number(values.landSharePercent) || 0)) / 100;
+    const acquisitionBase = nonNegative(values.purchasePrice)
+      + nonNegative(values.agencyFees)
+      + nonNegative(calculations.notary);
+    const landBase = acquisitionBase * landShare;
+    const buildingBase = acquisitionBase - landBase;
+    const buildingYears = Math.max(1, nonNegative(values.buildingUsefulLifeYears) || 30);
+    const worksFromOperation = nonNegative(values.works);
+    const capitalizedWorksBase = Math.min(worksFromOperation, nonNegative(values.capitalizedWorks));
+    const deductibleWorksYear1 = worksFromOperation - capitalizedWorksBase;
+    const worksYears = Math.max(1, nonNegative(values.capitalizedWorksUsefulLifeYears) || 15);
+    const furnitureBase = nonNegative(values.furnitureAssetValue);
+    const furnitureYears = Math.max(1, nonNegative(values.furnitureUsefulLifeYears) || 7);
+    const annualBuilding = buildingBase / buildingYears;
+    const annualCapitalizedWorks = capitalizedWorksBase / worksYears;
+    const annualFurniture = furnitureBase / furnitureYears;
+
+    return {
+      acquisitionBase, landBase, buildingBase, buildingYears, annualBuilding,
+      worksFromOperation, capitalizedWorksBase, deductibleWorksYear1, worksYears,
+      annualCapitalizedWorks, furnitureBase, furnitureYears, annualFurniture,
+      annualTotal: annualBuilding + annualCapitalizedWorks + annualFurniture
+    };
+  }
+
   function buildLoanSchedule(values, calculations) {
     const monthsTotal = Math.max(1, Math.round(values.loanYears * 12));
     const yearsTotal = Math.ceil(monthsTotal / 12);
@@ -239,8 +271,8 @@
     const monthlyCashflow = useColocation ? calculations.colocCashflow : calculations.standardCashflow;
     const scenarioLabel = useColocation ? "colocation" : "location standard";
     const annualRent = 12 * (useColocation ? calculations.colocIncome : calculations.standardIncome);
-    const extraDeductions = Math.max(0, Number(values.annualAdditionalDeductions) || 0);
-    const requestedAmortization = Math.max(0, Number(values.annualTaxAmortization) || 0);
+    const annualOtherDeductions = Math.max(0, Number(values.annualAdditionalDeductions) || 0);
+    const amortizationEstimate = estimateTaxAmortization(values, calculations);
     const marginalRate = Number.isFinite(values.taxMarginalRate)
       ? Math.max(0, Math.min(45, values.taxMarginalRate)) / 100
       : null;
@@ -254,12 +286,21 @@
       const propertyEquity = propertyValue - loanRow.balance;
       const grossRent = year === 0 ? 0 : annualRent;
       const ordinaryDeductions = year === 0 ? 0 : annualDeductibleExpenses(values, useColocation);
-      const otherPaidDeductions = year === 0 ? 0 : extraDeductions;
+      const otherPaidDeductions = year === 0 ? 0
+        : annualOtherDeductions + (year === 1 ? amortizationEstimate.deductibleWorksYear1 : 0);
       const resultBeforeAmortization = grossRent - ordinaryDeductions
         - loanRow.interestPaid - otherPaidDeductions;
+      const depreciationForYear = (base, usefulLife) => {
+        const remainingYearFraction = Math.max(0, Math.min(1, usefulLife - (year - 1)));
+        return base / usefulLife * remainingYearFraction;
+      };
+      const amortizationEstimateForYear = year === 0 ? 0
+        : depreciationForYear(amortizationEstimate.buildingBase, amortizationEstimate.buildingYears)
+          + depreciationForYear(amortizationEstimate.capitalizedWorksBase, amortizationEstimate.worksYears)
+          + depreciationForYear(amortizationEstimate.furnitureBase, amortizationEstimate.furnitureYears);
       const amortizationUsed = Math.min(
         Math.max(0, resultBeforeAmortization),
-        year === 0 ? 0 : requestedAmortization
+        amortizationEstimateForYear
       );
       const taxableResult = resultBeforeAmortization - amortizationUsed;
       const taxableBase = Math.max(0, taxableResult);
@@ -270,7 +311,7 @@
         + otherPaidDeductions + amortizationUsed;
       const annualCashflowAfterTax = year === 0
         ? 0
-        : monthlyCashflow * 12 - otherPaidDeductions - totalTax;
+        : monthlyCashflow * 12 - annualOtherDeductions - totalTax;
 
       cumulativeCashflow += annualCashflowAfterTax;
       const projectResult = propertyEquity + cumulativeCashflow - values.contribution;
@@ -282,6 +323,9 @@
         interestPaid: loanRow.interestPaid,
         loanPayments: loanRow.payments,
         grossRent,
+        otherPaidDeductions,
+        amortizationEstimate: amortizationEstimateForYear,
+        amortizationUsed,
         deductions,
         taxableResult,
         incomeTax,
@@ -308,6 +352,19 @@
     setText("taxIncomeYear1", formatMoney(firstOperatingYear.incomeTax));
     setText("taxSocialYear1", formatMoney(firstOperatingYear.socialContributions));
     setText("taxNetMonthlyYear1", formatMoney(firstOperatingYear.afterTaxMonthlyCashflow));
+    setText("taxAdditionalDeductionsYear1", formatMoney(firstOperatingYear.otherPaidDeductions));
+    setText("taxAmortizationEstimateAnnual", formatMoney(amortizationEstimate.annualTotal));
+    setText("taxAmortizationUsedYear1", formatMoney(firstOperatingYear.amortizationUsed));
+    setText("taxWorksFromOperation", formatMoney(amortizationEstimate.worksFromOperation));
+    setText("taxDeductibleWorksYear1", formatMoney(amortizationEstimate.deductibleWorksYear1));
+    setText("taxAmortizationAcquisitionBase", formatMoney(amortizationEstimate.acquisitionBase));
+    setText("taxAmortizationLandBase", formatMoney(amortizationEstimate.landBase));
+    setText("taxAmortizationBuildingBase", formatMoney(amortizationEstimate.buildingBase));
+    setText("taxAmortizationBuildingAnnual", formatMoney(amortizationEstimate.annualBuilding));
+    setText("taxCapitalizedWorksBase", formatMoney(amortizationEstimate.capitalizedWorksBase));
+    setText("taxAmortizationWorksAnnual", formatMoney(amortizationEstimate.annualCapitalizedWorks));
+    setText("taxAmortizationFurnitureBase", formatMoney(amortizationEstimate.furnitureBase));
+    setText("taxAmortizationFurnitureAnnual", formatMoney(amortizationEstimate.annualFurniture));
     const tmiInput = document.getElementById("taxMarginalRate");
     setText("taxEstimateNotice", !tmiInput || tmiInput.value.trim() === ""
       ? "Saisis ton taux marginal d’imposition pour estimer l’impôt sur le revenu ; les prélèvements sociaux affichés restent une estimation."
@@ -319,7 +376,9 @@
       '<td>' + formatMoney(row.principalRepaid) + '</td>' +
       '<td>' + formatMoney(row.interestPaid) + '</td>' +
       '<td>' + formatMoney(row.loanBalance) + '</td>' +
-      '<td>' + formatMoney(Math.max(0, row.deductions - row.interestPaid)) + '</td>' +
+      '<td>' + formatMoney(row.otherPaidDeductions) + '</td>' +
+      '<td>' + formatMoney(row.amortizationEstimate) + '</td>' +
+      '<td>' + formatMoney(row.amortizationUsed) + '</td>' +
       '<td>' + formatMoney(row.taxableResult) + '</td>' +
       '<td>' + formatMoney(row.totalTax) + '</td>' +
       '<td>' + formatMoney(row.afterTaxMonthlyCashflow) + '</td>' +

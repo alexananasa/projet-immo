@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#12392e">
   <meta name="description" content="Analyse immobilière modifiable avec comparaison location standard et colocation.">
   <title>Analyse immobilière</title>
-  <link rel="stylesheet" href="assets/css/styles.css?v=scenario-fields-20261011-01">
-  <script src="assets/js/app.js?v=scenario-fields-20261011-01" defer></script>
-  <script type="module" src="assets/js/cloud-saves.js?v=scenario-fields-20261011-01"></script>
+  <link rel="stylesheet" href="assets/css/styles.css?v=tax-amortization-20261011-01">
+  <script src="assets/js/app.js?v=tax-amortization-20261011-01" defer></script>
+  <script type="module" src="assets/js/cloud-saves.js?v=tax-amortization-20261011-01"></script>
 </head>
 <body>
   <main class="page-shell">
@@ -144,23 +144,87 @@
               <small>Valeur initiale pour une estimation LMNP ; modifie-la si ton comptable confirme un autre taux.</small>
             </div>
             <div class="field">
-              <label for="annualAdditionalDeductions">Travaux et autres charges payés et déductibles en plus (€/an)</label>
+              <label for="annualAdditionalDeductions">Autres charges déductibles récurrentes (€ / an)</label>
               <input id="annualAdditionalDeductions" data-field="annualAdditionalDeductions" type="text" inputmode="decimal" value="0" spellcheck="false">
-              <small>Saisis seulement le montant admis par ton comptable, hors charges déjà renseignées. Il est aussi retiré de la trésorerie.</small>
+              <small>Charges supplémentaires récurrentes, hors travaux saisis dans l’opération et hors charges déjà renseignées dans les scénarios.</small>
             </div>
             <div class="field">
-              <label for="annualTaxAmortization">Amortissement fiscal annuel estimé par ton comptable (€)</label>
-              <input id="annualTaxAmortization" data-field="annualTaxAmortization" type="text" inputmode="decimal" value="0" spellcheck="false">
-              <small>Déduction comptable non décaissée cette année ; elle ne réduit donc pas le cash-flow réel.</small>
+              <label for="taxAdditionalDeductionsYear1">Travaux et autres déductions payés · année 1 (€)</label>
+              <output class="amortization-calculated-value" id="taxAdditionalDeductionsYear1">—</output>
+              <small>Montant automatique : travaux déductibles saisis dans l’opération + charges récurrentes ci-dessus. La part immobilisée passe en amortissement.</small>
             </div>
           </div>
+
+          <section class="amortization-calculator" aria-labelledby="amortization-calculator-title">
+            <div class="amortization-calculator__heading">
+              <div>
+                <span class="section-kicker">Estimation modifiable</span>
+                <h4 id="amortization-calculator-title">Calcul indicatif de l’amortissement annuel</h4>
+                <p>Formule estimative : (prix + frais retenus − terrain) ÷ durée du logement, puis ajout des travaux immobilisés et du mobilier ÷ leurs durées. Les dotations cessent à la fin de chaque durée saisie.</p>
+              </div>
+              <div class="amortization-total">
+                <span>Amortissement comptable estimé / an</span>
+                <strong id="taxAmortizationEstimateAnnual">—</strong>
+              </div>
+            </div>
+
+            <div class="field-grid amortization-calculator__inputs">
+              <div class="field">
+                <label for="landSharePercent">Part du terrain estimée (%)</label>
+                <input id="landSharePercent" data-field="landSharePercent" type="text" inputmode="decimal" value="15" spellcheck="false">
+                <small>Hypothèse initiale modifiable. Le terrain est exclu de la base amortissable.</small>
+              </div>
+              <div class="field">
+                <label for="buildingUsefulLifeYears">Durée d’utilisation supposée du logement (ans)</label>
+                <input id="buildingUsefulLifeYears" data-field="buildingUsefulLifeYears" type="text" inputmode="numeric" value="30" spellcheck="false">
+                <small>Hypothèse linéaire de départ, à remplacer par la durée retenue dans le plan comptable.</small>
+              </div>
+              <div class="field">
+                <label for="capitalizedWorks">Part des travaux immobilisée (€)</label>
+                <input id="capitalizedWorks" data-field="capitalizedWorks" type="text" inputmode="decimal" value="0" spellcheck="false">
+                <small>À ajuster selon la nature des travaux. Cette part n’est pas déduite immédiatement ; elle rejoint l’estimation d’amortissement.</small>
+              </div>
+              <div class="field">
+                <label for="capitalizedWorksUsefulLifeYears">Durée d’utilisation supposée des travaux immobilisés (ans)</label>
+                <input id="capitalizedWorksUsefulLifeYears" data-field="capitalizedWorksUsefulLifeYears" type="text" inputmode="numeric" value="15" spellcheck="false">
+                <small>Hypothèse de calcul modifiable, à confirmer selon les travaux et leur durée d’utilisation.</small>
+              </div>
+              <div class="field">
+                <label for="furnitureAssetValue">Valeur du mobilier à amortir (€)</label>
+                <input id="furnitureAssetValue" data-field="furnitureAssetValue" type="text" inputmode="decimal" value="0" spellcheck="false">
+                <small>Laisse 0 si tu n’as pas encore estimé le coût du mobilier immobilisé.</small>
+              </div>
+              <div class="field">
+                <label for="furnitureUsefulLifeYears">Durée d’utilisation supposée du mobilier (ans)</label>
+                <input id="furnitureUsefulLifeYears" data-field="furnitureUsefulLifeYears" type="text" inputmode="numeric" value="7" spellcheck="false">
+                <small>Hypothèse modifiable selon le mobilier et sa durée d’usage attendue.</small>
+              </div>
+            </div>
+
+            <div class="amortization-breakdown" aria-live="polite">
+              <div class="amortization-breakdown__item"><span>Prix du logement + agence + frais de notaire estimés</span><strong id="taxAmortizationAcquisitionBase">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Valeur estimée du terrain exclue</span><strong id="taxAmortizationLandBase">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Base estimée du logement amortissable</span><strong id="taxAmortizationBuildingBase">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Amortissement annuel estimé du logement</span><strong id="taxAmortizationBuildingAnnual">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Travaux immobilisés retenus</span><strong id="taxCapitalizedWorksBase">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Amortissement annuel estimé des travaux</span><strong id="taxAmortizationWorksAnnual">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Valeur du mobilier retenue</span><strong id="taxAmortizationFurnitureBase">—</strong></div>
+              <div class="amortization-breakdown__item"><span>Amortissement annuel estimé du mobilier</span><strong id="taxAmortizationFurnitureAnnual">—</strong></div>
+            </div>
+
+            <p class="amortization-calculator__notice"><strong>Travaux repris automatiquement :</strong> <span id="taxWorksFromOperation">—</span> depuis « Opération et crédit → Travaux (€) ». Par défaut, le simulateur traite les travaux non immobilisés comme une charge déductible en année 1 seulement : <strong id="taxDeductibleWorksYear1">—</strong>. Cette qualification est provisoire : les dépenses qui créent ou améliorent durablement un actif peuvent devoir être immobilisées. Saisis leur part dans « Part des travaux immobilisée » pour l’ajouter à l’amortissement au lieu de la déduire immédiatement. Les travaux restent déjà compris dans le coût de l’opération ; ils ne sont pas retirés une deuxième fois du cash-flow annuel.</p>
+          </section>
           <div class="tax-summary-grid" aria-live="polite">
             <article class="tax-summary-card">
               <span>Recettes encaissées estimées · année 1</span>
               <strong id="taxGrossRentYear1">—</strong>
             </article>
             <article class="tax-summary-card">
-              <span>Déductions prises en compte · année 1</span>
+              <span>Amortissement estimé retenu fiscalement · année 1</span>
+              <strong id="taxAmortizationUsedYear1">—</strong>
+            </article>
+            <article class="tax-summary-card">
+              <span>Total des déductions prises en compte · année 1</span>
               <strong id="taxDeductionsYear1">—</strong>
             </article>
             <article class="tax-summary-card">
@@ -181,7 +245,7 @@
             </article>
           </div>
           <p class="tax-estimate-notice" id="taxEstimateNotice" role="status" aria-live="polite"></p>
-          <p class="tax-estimator__note"><strong>Hypothèses :</strong> les recettes comprennent les loyers et charges encaissés. Les charges déjà saisies dans l’analyse sont reprises selon le scénario ; les intérêts du prêt sont déduits, jamais le capital remboursé. L’amortissement est limité au résultat positif disponible. Cette simulation suppose une situation LMNP simplifiée ; les déficits reportés, la situation LMP/Urssaf, le barème complet du foyer et les autres règles comptables ne sont pas modélisés. Fais valider les déductions et le résultat par ton comptable.</p>
+          <p class="tax-estimator__note"><strong>Hypothèses :</strong> les recettes comprennent les loyers et charges encaissés. Les charges des scénarios, les intérêts (pas le capital du prêt) et les autres charges sont repris. Le montant des travaux est supposé déductible en année 1, sauf la part déclarée immobilisée ; fais qualifier chaque facture par ton comptable. L’amortissement estimé est limité au résultat positif après les autres charges. Le simulateur ne suit pas le report des amortissements non déduits, les déficits reportables, le statut LMP/Urssaf ni le barème complet du foyer. Il fournit une estimation de travail, pas une déclaration fiscale. Sources : <a href="https://www.impots.gouv.fr/particulier/les-regimes-dimposition" target="_blank" rel="noopener">impots.gouv.fr · régime réel</a> et <a href="https://bofip.impots.gouv.fr/bofip/3610-PGP.html/identifiant=BOI-BIC-CHAMP-40-20-20260819" target="_blank" rel="noopener">BOFiP · location meublée</a>.</p>
         </section>
 
         <div class="projection-summary-grid" aria-live="polite">
@@ -232,7 +296,9 @@
                 <th scope="col">Capital remboursé/an</th>
                 <th scope="col">Intérêts payés/an</th>
                 <th scope="col">Capital restant dû</th>
-                <th scope="col">Autres déductions/an</th>
+                <th scope="col">Travaux + autres charges/an</th>
+                <th scope="col">Amortissement estimé/an</th>
+                <th scope="col">Amortissement déduit/an</th>
                 <th scope="col">Résultat BIC estimé</th>
                 <th scope="col">Impôts estimés/an</th>
                 <th scope="col">Cash-flow net/mois</th>
@@ -245,7 +311,7 @@
             <tbody id="projectionTableBody"></tbody>
           </table>
         </div>
-        <p class="projection-note"><strong>Lecture :</strong> patrimoine net = valeur estimée − capital restant dû. Bilan du projet = patrimoine net + trésorerie cumulée après impôts − apport. Les recettes, loyers et charges sont supposés constants, sans vacance. Le résultat fiscal et l’impôt sont des estimations à partir du TMI saisi, du taux de prélèvements sociaux et des charges retenues ; déficits reportables, calcul fiscal du foyer et frais de revente ne sont pas modélisés. La plus-value reste théorique tant que le bien n’est pas vendu.</p>
+        <p class="projection-note"><strong>Lecture :</strong> patrimoine net = valeur estimée − capital restant dû. Bilan du projet = patrimoine net + trésorerie cumulée après impôts − apport. Les travaux saisis sont affichés dans les déductions de l’année 1, selon l’hypothèse choisie dans la partie Fiscalité. Les recettes et charges sont supposées constantes, sans vacance. Le résultat fiscal et l’impôt sont des estimations ; déficits reportables, amortissements non déduits et frais de revente ne sont pas modélisés. La plus-value reste théorique tant que le bien n’est pas vendu.</p>
       </article>
     </section>
 
