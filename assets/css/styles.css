@@ -347,3 +347,16 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
 
 /* Do not apply the stacked-panel gap to cards in a side-by-side scenario grid. */
 .two-column > .panel + .panel { margin-top: 0; }
+
+
+/* Keep labels at a shared height so editable fields line up inside each scenario row. */
+.scenario-editor__content .field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: stretch;
+}
+.scenario-editor__content .field > label {
+  min-height: 2.8em;
+  line-height: 1.35;
+}
