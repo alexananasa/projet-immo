@@ -63,9 +63,8 @@ h1 { max-width: 780px; margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-heig
 .calc-item strong { display: block; margin-top: 5px; font-size: 1.02rem; font-variant-numeric: tabular-nums; }
 .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .scenario-results .result-tile:last-child { grid-column: 1 / -1; }
-@media (min-width: 1101px) {
-  .scenario__body > .field-grid { min-height: 320px; align-content: start; }
-}
+.scenario__body { display: flex; flex-direction: column; }
+.scenario__body > .scenario-results { order: -1; margin: 0 0 18px; }
 .scenario { overflow: hidden; padding: 0; }
 .scenario__head { padding: 20px 22px; color: white; background: var(--green-dark); }
 .scenario--coloc .scenario__head { background: #285847; }
