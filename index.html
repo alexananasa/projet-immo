@@ -148,6 +148,11 @@
               <input id="annualAdditionalDeductions" data-field="annualAdditionalDeductions" type="text" inputmode="decimal" value="0" spellcheck="false">
               <small>Charges supplémentaires récurrentes, hors travaux saisis dans l’opération et hors charges déjà renseignées dans les scénarios.</small>
             </div>
+            <div class="field">
+              <label for="taxAdditionalDeductionsYear1">Travaux et autres déductions payés · année 1 (€)</label>
+              <output class="amortization-calculated-value" id="taxAdditionalDeductionsYear1">—</output>
+              <small>Montant automatique : travaux déductibles saisis dans l’opération + charges récurrentes ci-dessus. La part immobilisée passe en amortissement.</small>
+            </div>
           </div>
 
           <section class="amortization-calculator" aria-labelledby="amortization-calculator-title">
@@ -213,10 +218,6 @@
             <article class="tax-summary-card">
               <span>Recettes encaissées estimées · année 1</span>
               <strong id="taxGrossRentYear1">—</strong>
-            </article>
-            <article class="tax-summary-card">
-              <span>Travaux + autres déductions payées · année 1</span>
-              <strong id="taxAdditionalDeductionsYear1">—</strong>
             </article>
             <article class="tax-summary-card">
               <span>Amortissement estimé retenu fiscalement · année 1</span>
