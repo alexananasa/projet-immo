@@ -330,6 +330,11 @@
           <div class="scenario__body">
             <div class="scenario-results" aria-live="polite">
               <div class="result-tile"><span>Recettes mensuelles</span><strong id="standardIncome">—</strong></div>
+              <div class="result-tile"><span>Dépenses mensuelles</span><strong id="standardExpenses">—</strong></div>
+              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="standardCashflow">—</strong></div>
+              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="standardRatio">—</strong></div>
+              <div class="result-tile"><span>Rentabilité brute</span><strong id="standardYield">—</strong></div>
+            </div>
             <details class="scenario-editor">
               <summary><span>Paramètres et détail du calcul</span><span class="scenario-editor__action">Modifier</span></summary>
               <div class="scenario-editor__content">
@@ -338,17 +343,10 @@
               <div class="field"><label for="standardTenantCharges">Charges locataire mensuelles (€)</label><input id="standardTenantCharges" data-field="standardTenantCharges" type="text" inputmode="decimal" value="50" spellcheck="false"></div>
               <div class="field"><label for="standardCfeAnnual">CFE annuelle (€)</label><input id="standardCfeAnnual" data-field="standardCfeAnnual" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
             </div>
-<div class="result-tile"><span>Dépenses mensuelles</span><strong id="standardExpenses">—</strong></div>
-              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="standardCashflow">—</strong></div>
-              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="standardRatio">—</strong></div>
-              <div class="result-tile"><span>Rentabilité brute</span><strong id="standardYield">—</strong></div>
-            </div>
-
-            <h4 class="subsection-title">Détail des recettes</h4>
+                <h4 class="subsection-title">Détail des recettes</h4>
             <div class="cost-list" id="standardIncomeRows"></div>
             <h4 class="subsection-title">Détail des dépenses</h4>
             <div class="cost-list" id="standardExpenseRows"></div>
-          
               </div>
             </details>
           </div>
@@ -362,6 +360,11 @@
           <div class="scenario__body">
             <div class="scenario-results" aria-live="polite">
               <div class="result-tile"><span>Recettes mensuelles</span><strong id="colocIncome">—</strong></div>
+              <div class="result-tile"><span>Dépenses mensuelles</span><strong id="colocExpenses">—</strong></div>
+              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="colocCashflow">—</strong></div>
+              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="colocRatio">—</strong></div>
+              <div class="result-tile"><span>Rentabilité brute (Excel)</span><strong id="colocYield">—</strong></div>
+            </div>
             <details class="scenario-editor">
               <summary><span>Paramètres et détail du calcul</span><span class="scenario-editor__action">Modifier</span></summary>
               <div class="scenario-editor__content">
@@ -375,18 +378,11 @@
               <div class="field"><label for="cleaning">Ménage mensuel (€)</label><input id="cleaning" data-field="cleaning" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
               <div class="field"><label for="colocCfeAnnual">CFE annuelle (€)</label><input id="colocCfeAnnual" data-field="colocCfeAnnual" type="text" inputmode="decimal" value="0" spellcheck="false"></div>
             </div>
-<div class="result-tile"><span>Dépenses mensuelles</span><strong id="colocExpenses">—</strong></div>
-              <div class="result-tile result-tile--cash"><span>Cash-flow mensuel</span><strong id="colocCashflow">—</strong></div>
-              <div class="result-tile"><span>Ratio crédit / loyer</span><strong id="colocRatio">—</strong></div>
-              <div class="result-tile"><span>Rentabilité brute (Excel)</span><strong id="colocYield">—</strong></div>
-            </div>
-
-            <h4 class="subsection-title">Détail des recettes</h4>
+                <h4 class="subsection-title">Détail des recettes</h4>
             <div class="cost-list" id="colocIncomeRows"></div>
             <h4 class="subsection-title">Détail des dépenses</h4>
             <div class="cost-list" id="colocExpenseRows"></div>
             <p class="notice">La formule de rentabilité brute de la colocation dans l’Excel pointe vers une plage vide et renvoie 0 %. Cette valeur est conservée pour correspondre au classeur. Le total des charges du site additionne aussi l’eau, l’assurance logement, le ménage et la CFE lorsqu’ils sont renseignés.</p>
-          
               </div>
             </details>
           </div>
